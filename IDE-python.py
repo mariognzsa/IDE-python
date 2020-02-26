@@ -96,7 +96,6 @@ class TextEditor:
 			master, 
 			font = font_specs, 
 			undo = True, 
-			redo = True,
 			autoseparators = True, 
 			maxundo = -1
 		)
@@ -185,7 +184,7 @@ class TextEditor:
 		self.master.bind('<Button-1>', self.statusbar.update_statusbar)
 		self.master.bind('<Key>', self.statusbar.update_statusbar)
 		self.textarea.bind('<Key>', self.statusbar.update_parent_title)
-
+		self.master.bind('<Motion>', self.statusbar.update_statusbar)
 
 
 
