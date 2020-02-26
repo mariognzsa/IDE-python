@@ -1,4 +1,4 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import filedialog
 
 ## Class that manages the bottom-left status bar
@@ -8,9 +8,12 @@ class Statusbar:
 	def __init__(self, parent):
 		self.parent = parent
 		font_specs = ('Ubuntu', 10)
-		self.status = tk.StringVar()
-		self.status.set('MaKen TextEditor - 0.1')
-		label = tk.Label(
+		self.status = StringVar()
+		coordenadas = self.parent.textarea.index(INSERT).split('.')
+		cool = coordenadas[0]
+		cooc = int(coordenadas[1]) +1
+		self.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
+		label = Label(
 			parent.textarea, 
 			textvariable = self.status, 
 			fg = 'black', 
@@ -18,18 +21,25 @@ class Statusbar:
 			anchor = 'sw',
 			font = font_specs
 		)
-		label.pack(side = tk.BOTTOM, fill = tk.BOTH)
+		label.pack(side = BOTTOM, fill = BOTH)
 
 	## Update method for the label
 	def update_statusbar(self, *args):
-	
-		if isinstance(args[0], bool):
-			self.status.set('MaKen TextEditor - 0.1 (Cambios guardados con exito)')
-			self.parent.set_window_title(self.parent.filename)
-		else:
-			self.status.set('MaKen TextEditor - 0.1 (Cambios sin guardar)')
-			self.parent.set_window_title(self.parent.filename + '*')
+		coordenadas = self.parent.textarea.index(INSERT).split('.')
+		cool = coordenadas[0]
+		cooc = int(coordenadas[1]) +1
+		self.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
 
+	def update_parent_title(self, *args):
+		if self.parent.filename:
+			self.parent.set_window_title(str(self.parent.filename) + '*')
+		else:
+			self.parent.set_window_title('Sin titulo* ')
+		self.update_statusbar()
+
+	def update_saved_changes(self, *args):
+		self.status.set(self.status.get() + ' (Cambios guardados con exito)')
+		self.parent.set_window_title(self.parent.filename)
 
 
 
@@ -39,10 +49,10 @@ class Toolbar:
 	def __init__(self, parent):
 		font_specs = ('ubuntu', 12)
 
-		toolbar = tk.Menu(parent.master)
+		toolbar = Menu(parent.master)
 		parent.master.config(menu = toolbar)
 
-		file_dropdown = tk.Menu(toolbar, font = font_specs, tearoff = 0)
+		file_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
 		file_dropdown.add_command(
 			label = 'Nuevo Archivo', 
 			accelerator = 'Ctrl+N',
@@ -82,17 +92,25 @@ class TextEditor:
 		self.filename = None
 		self.set_window_title()
 
-		self.textarea = tk.Text(master, font = font_specs)
-		self.scroll = tk.Scrollbar(master, command = self.textarea.yview)
+		self.textarea = Text(
+			master, 
+			font = font_specs, 
+			undo = True, 
+			redo = True,
+			autoseparators = True, 
+			maxundo = -1
+		)
+		self.scroll = Scrollbar(master, command = self.textarea.yview)
 		self.textarea.configure(yscrollcommand = self.scroll.set)
-		self.textarea.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
-		self.scroll.pack(side = tk.RIGHT, fill = tk.Y)
+		self.textarea.pack(side = LEFT, fill = BOTH, expand = True)
+		self.scroll.pack(side = RIGHT, fill = Y)
 
 		self.toolbar = Toolbar(self)
 
 		self.statusbar = Statusbar(self)
 
 		self.bind_shortcuts()
+		self.textarea.focus()
 
 	def set_window_title(self, name = None):
 		if name:
@@ -101,7 +119,7 @@ class TextEditor:
 			self.master.title('Sin titulo - MaKen TextEditor')
 
 	def new_file(self, *args):
-		self.textarea.delete(1.0, tk.END)
+		self.textarea.delete(1.0, END)
 		self.filename = None
 		self.set_window_title()	
 
@@ -117,18 +135,19 @@ class TextEditor:
 		)
 
 		if self.filename:
-			self.textarea.delete(1.0, tk.END)
+			self.textarea.delete(1.0, END)
 			with open(self.filename, 'r') as file:
 				self.textarea.insert(1.0, file.read())
 			self.set_window_title(self.filename)
+			self.textarea.mark_set('insert', '1.0')
 
 	def save(self, *args):
 		if self.filename:
 			try:
-				textarea_content = self.textarea.get(1.0, tk.END)
+				textarea_content = self.textarea.get(1.0, END)
 				with open(self.filename, 'w') as file:
 					file.write(textarea_content)
-				self.statusbar.update_statusbar(True)
+				self.statusbar.update_saved_changes()
 
 			except Exception as e:
 				print(e)
@@ -148,12 +167,12 @@ class TextEditor:
 							('HTML Documents', '*.html'),
 							('CSS Documents', '*.css')]
 			)
-			textarea_content = self.textarea.get(1.0, tk.END)
+			textarea_content = self.textarea.get(1.0, END)
 			with open(new_file, 'w') as file:
 				file.write(textarea_content)
 			self.filename = new_file
 			self.set_window_title(self.filename)
-			self.statusbar.update_statusbar(True)
+			self.statusbar.update_saved_changes()
 
 		except Exception as e:
 			print(e)
@@ -163,12 +182,14 @@ class TextEditor:
 		self.textarea.bind('<Control-o>', self.open_file)
 		self.textarea.bind('<Control-s>', self.save)
 		self.textarea.bind('<Control-S>', self.save_as)
-		self.textarea.bind('<Key>', self.statusbar.update_statusbar)
+		self.master.bind('<Button-1>', self.statusbar.update_statusbar)
+		self.master.bind('<Key>', self.statusbar.update_statusbar)
+		self.textarea.bind('<Key>', self.statusbar.update_parent_title)
 
 
 
 
 if __name__ == '__main__':
-	master = tk.Tk()
+	master = Tk()
 	textEditor = TextEditor(master)
 	master.mainloop()
