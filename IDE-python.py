@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
+import os
 
 ## Class that manages the bottom-left status bar
 
@@ -78,6 +79,20 @@ class Toolbar:
 
 		toolbar.add_cascade(label = 'Archivo', menu = file_dropdown)
 
+		#For the compile button
+		compile_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
+		compile_dropdown.add_command(
+			label = 'Compilar', 
+			accelerator = 'F10',
+			command = parent.compile
+		)
+		compile_dropdown.add_command(
+			label = 'Depurar',
+			command = parent.debug
+		)
+		toolbar.add_cascade(label = 'Compilar', menu = compile_dropdown)
+
+
 
 ### Controller class
 
@@ -95,7 +110,7 @@ class TextEditor:
 		self.textarea = Text(
 			master, 
 			font = font_specs, 
-			undo = True, 
+			undo = True,
 			autoseparators = True, 
 			maxundo = -1
 		)
@@ -181,10 +196,17 @@ class TextEditor:
 		self.textarea.bind('<Control-o>', self.open_file)
 		self.textarea.bind('<Control-s>', self.save)
 		self.textarea.bind('<Control-S>', self.save_as)
+		self.master.bind('<F9>', self.compile)
 		self.master.bind('<Button-1>', self.statusbar.update_statusbar)
 		self.master.bind('<Key>', self.statusbar.update_statusbar)
 		self.textarea.bind('<Key>', self.statusbar.update_parent_title)
 		self.master.bind('<Motion>', self.statusbar.update_statusbar)
+
+	def compile(self, *args):
+		os.system('echo "Compilando..."')
+
+	def debug(self):
+		pass
 
 
 
