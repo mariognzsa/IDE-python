@@ -15,14 +15,15 @@ class Statusbar:
 		cooc = int(coordenadas[1]) +1
 		self.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
 		label = Label(
-			parent.textarea, 
+			parent.frameCode, 
 			textvariable = self.status, 
 			fg = 'black', 
 			bg = 'lightgrey', 
 			anchor = 'sw',
 			font = font_specs
 		)
-		label.pack(side = BOTTOM, fill = BOTH)
+		#label.pack(side = BOTTOM, fill = BOTH)
+		label.grid(row=1, columnspan=3, sticky=E+W+S)
 
 	## Update method for the label
 	def update_statusbar(self, *args):
@@ -83,7 +84,7 @@ class Toolbar:
 		compile_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
 		compile_dropdown.add_command(
 			label = 'Compilar', 
-			accelerator = 'F10',
+			accelerator = 'F9',
 			command = parent.compile
 		)
 		compile_dropdown.add_command(
@@ -107,24 +108,55 @@ class TextEditor:
 		self.filename = None
 		self.set_window_title()
 
+		self.content = Frame(master)
+		self.frameCode = Frame(self.content)
+
+		self.rowCount = Text(
+			self.frameCode, 
+			fg = 'grey35',
+			bg = 'lightgrey',
+			font = font_specs
+		)
+		
+		self.rowCount.grid(row=0, column=0, sticky=N+S)
+		self.rowCount.delete(1.0, END)
+		self.rowCount.insert(END, "1\n2\n3\n4\n5\n1\n2\n3\n4\n1\n2\n3\n4\n1\n2\n3\n4\n1\n2\n3\n10\n1\n2\n3\n4\n1\n2\n3\n4\n")
+		self.rowCount.config(state=DISABLED)
+
 		self.textarea = Text(
-			master, 
+			self.frameCode, 
 			font = font_specs, 
 			undo = True,
 			autoseparators = True, 
 			maxundo = -1
 		)
-		self.scroll = Scrollbar(master, command = self.textarea.yview)
+		
+		self.scroll = Scrollbar(self.frameCode, command = self.textarea.yview)
 		self.textarea.configure(yscrollcommand = self.scroll.set)
-		self.textarea.pack(side = LEFT, fill = BOTH, expand = True)
-		self.scroll.pack(side = RIGHT, fill = Y)
+		self.textarea.grid(row=0, column=1)
+		self.scroll.grid(row=0, column=2, sticky=N+S)
+		
+		self.frameCode.grid_propagate(False)
+		self.frameCode.grid_columnconfigure(0, weight=1)  
+		self.frameCode.grid_rowconfigure(0, weight=1)  
+		#self.frameCode.grid(row=0, column=0, columnspan=1, sticky=E+W+N+S)
+		self.frameCode.place(relheight=.80, relwidth=1)
 
+		self.content.grid_propagate(False)
+		self.content.grid_columnconfigure(0, weight=1)  
+		self.content.grid_rowconfigure(0, weight=1)
+		self.content.place(relheight=1, relwidth=1)
+		
 		self.toolbar = Toolbar(self)
 
 		self.statusbar = Statusbar(self)
+		self.update_rowCount(self)
 
 		self.bind_shortcuts()
 		self.textarea.focus()
+
+	def update_rowCount(self, *args):
+		self.rowCount.yview_moveto(self.scroll.get()[0])
 
 	def set_window_title(self, name = None):
 		if name:
@@ -201,6 +233,8 @@ class TextEditor:
 		self.master.bind('<Key>', self.statusbar.update_statusbar)
 		self.textarea.bind('<Key>', self.statusbar.update_parent_title)
 		self.master.bind('<Motion>', self.statusbar.update_statusbar)
+		self.master.bind('<MouseWheel>', self.update_rowCount)
+		self.master.bind('<Button-1>', self.update_rowCount)
 
 	def compile(self, *args):
 		os.system('echo "Compilando..."')
