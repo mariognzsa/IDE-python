@@ -119,9 +119,6 @@ class TextEditor:
 		)
 		
 		self.rowCount.grid(row=0, column=0, sticky=N+S)
-		self.rowCount.delete(1.0, END)
-		self.rowCount.insert(END, "1\n2\n3\n4\n5\n1\n2\n3\n4\n1\n2\n3\n4\n1\n2\n3\n4\n1\n2\n3\n10\n1\n2\n3\n4\n1\n2\n3\n4\n")
-		self.rowCount.config(state=DISABLED)
 
 		self.textarea = Text(
 			self.frameCode, 
@@ -156,7 +153,18 @@ class TextEditor:
 		self.textarea.focus()
 
 	def update_rowCount(self, *args):
+		coordenadas = self.textarea.index(END).split('.')
+		nLineas = int(coordenadas[0]) - 1
+		print(nLineas)
+		cadNums = str()
+		for l in range(1,nLineas):
+			cadNums += str(l) + "\n"
+		self.rowCount.config(state=NORMAL)
+		self.rowCount.delete(1.0, END)
+		self.rowCount.insert(END, cadNums)
+		self.rowCount.config(state=DISABLED)
 		self.rowCount.yview_moveto(self.scroll.get()[0])
+		#self.rowCount.configure(YView)
 
 	def set_window_title(self, name = None):
 		if name:
