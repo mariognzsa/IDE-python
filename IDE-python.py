@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import filedialog
 import os
+from PIL import Image, ImageTk
+
 
 ## Class that manages the bottom-left status bar
 
@@ -54,6 +56,31 @@ class Toolbar:
 		toolbar = Menu(parent.master)
 		parent.master.config(menu = toolbar)
 
+		# Image files
+		self.image = Image.open("img/file-multiple.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_new_file = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/content-save.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_save = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/content-save-edit.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_save_as = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/folder-open.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_open = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/play-pause.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_compile = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/bug-check-outline.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_debug = ImageTk.PhotoImage(self.image)
+
 		file_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
 		file_dropdown.add_command(
 			label = 'Nuevo Archivo', 
@@ -83,15 +110,25 @@ class Toolbar:
 		#For the compile button
 		compile_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
 		compile_dropdown.add_command(
+			label = 'Depurar',
+			command = parent.debug
+		)
+		compile_dropdown.add_command(
 			label = 'Compilar', 
 			accelerator = 'F9',
 			command = parent.compile
 		)
-		compile_dropdown.add_command(
-			label = 'Depurar',
-			command = parent.debug
-		)
-		toolbar.add_cascade(label = 'Compilar', menu = compile_dropdown)
+		toolbar.add_cascade(label = 'Proyecto', menu = compile_dropdown)
+		
+		#btn_new_file = Button(toolbar, image = img_new_file, height = 30, width = 30)
+		toolbar.add_separator()
+		toolbar.add_command(image = self.img_new_file, command = parent.new_file)
+		toolbar.add_command(image = self.img_open, command = parent.open_file)
+		toolbar.add_command(image = self.img_save, command = parent.save)
+		toolbar.add_command(image = self.img_save_as, command = parent.save_as)
+		toolbar.add_separator()
+		toolbar.add_command(image = self.img_debug, command = parent.debug)
+		toolbar.add_command(image = self.img_compile, command = parent.compile)
 
 
 
@@ -237,6 +274,7 @@ class TextEditor:
 		self.textarea.bind('<Control-s>', self.save)
 		self.textarea.bind('<Control-S>', self.save_as)
 		self.master.bind('<F9>', self.compile)
+		self.master.bind('<F8>', self.debug)
 		self.master.bind('<Button-1>', self.statusbar.update_statusbar)
 		self.master.bind('<Key>', self.statusbar.update_statusbar)
 		self.textarea.bind('<Key>', self.statusbar.update_parent_title)
@@ -248,7 +286,7 @@ class TextEditor:
 		os.system('echo "Compilando..."')
 
 	def debug(self):
-		pass
+		os.system('echo "Depurando..."')
 
 
 
