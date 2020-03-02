@@ -544,7 +544,7 @@ class Toplevel1:
             try:
                 textarea_content = self.Scrolledtext1.get(1.0, tk.END)
                 with open(self.filename, 'w') as file:
-                    file.write(textarea_content)
+                    file.write(textarea_content.strip('\n'))
                 self.statusbar.update_saved_changes()
                 
             except Exception as e:
@@ -567,7 +567,7 @@ class Toplevel1:
             )
             textarea_content = self.Scrolledtext1.get(1.0, tk.END)
             with open(new_file, 'w') as file:
-                file.write(textarea_content)
+                file.write(textarea_content.strip('\n'))
             self.filename = new_file
             self.set_window_title(self.filename)
             #self.statusbar.update_saved_changes()
@@ -610,23 +610,14 @@ class Toplevel1:
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
         nLineas = int(coordenadas[0])
-        #print(nLineas)
         cadNums = str()
         for l in range(1,nLineas):
             cadNums += str(l) + "\n"
         self.Text1.config(state=tk.NORMAL)
         self.Text1.delete(1.0, tk.END)
-        self.Text1.insert(tk.END, cadNums)
-        #self.Text1.yview_moveto(self.scroll.yview)
+        self.Text1.insert(tk.END, cadNums.strip('\n'))
         self.Text1.config(state=tk.DISABLED)
-        #print self.scroll.get()[0]
-        #scroll_position = 
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
-        #print self.Scrolledtext1.yview()[0]
-        #print vars(self.Scrolledtext1.tk)
-        #print(self.Scrolledtext1.vertical_scroll.yview)
-        #self.Text1.yview_moveto(self.Scrolledtext1.yview)
-        #print(self.scroll.get())
     #
 
 class Statusbar:
@@ -774,8 +765,3 @@ def _on_shiftmouse(event, widget):
 
 if __name__ == '__main__':
     vp_start_gui()
-
-
-
-
-
