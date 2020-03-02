@@ -596,16 +596,15 @@ class Toplevel1:
         root.bind('<F8>', self.debug)
         
         self.Scrolledtext1.bind('<Key>', self.statusbar.update_parent_title)
-        root.bind('<ButtonRelease-1>', self.update_rowCount)
+        root.bind('<Button-1>', self.update_rowCount)
         root.bind('<Key>', self.update_rowCount)
         root.bind('<Motion>', self.update_rowCount)
         root.bind('<MouseWheel>', self.update_rowCount)
 
-        self.Scrolledtext1.bind('<Configure>',self.statusbar.update_statusbar)
-        #root.bind('<Button-1>', self.statusbar.update_statusbar)
-        #root.bind('<Key>', self.statusbar.update_statusbar)
-        #root.bind('<Motion>', self.statusbar.update_statusbar)
-        #root.bind('<MouseWheel>', self.statusbar.update_statusbar)
+        root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
+        root.bind('<KeyRelease>', self.statusbar.update_statusbar)
+        root.bind('<Motion>', self.statusbar.update_statusbar)
+        root.bind('<MouseWheel>', self.statusbar.update_statusbar)
 
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
@@ -640,12 +639,11 @@ class Statusbar:
         if self.parent.filename:
             self.parent.set_window_title(str(self.parent.filename) + '*')
         else:
-            self.parent.set_window_title('Sin titulo* ')
+            self.parent.set_window_title('Sin titulo*')
         self.update_statusbar()
         
     def update_saved_changes(self, *args):
-        self.parent.status.set(self.parent.status.get() + ' (Cambios guardados con exito)')
-        self.parent.set_window_title(self.parent.filename)
+        self.parent.set_window_title(self.parent.filename + ' (Cambios guardados con exito)')
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
