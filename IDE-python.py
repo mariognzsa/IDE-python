@@ -158,7 +158,7 @@ class TextEditor:
 		self.filename = None
 		self.set_window_title()
 
-		self.content = Frame(master)
+		self.content = Frame(self.master)
 		self.frameCode = Frame(self.content)
 
 		self.rowCount = Text(
