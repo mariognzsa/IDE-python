@@ -503,6 +503,7 @@ class Toplevel1:
 
         self.filename = None
         self.set_window_title()
+        self.update_rowCount()
         self.statusbar = Statusbar(self)
         self.bind_shortcuts()
         self.Scrolledtext1.focus()
@@ -593,16 +594,22 @@ class Toplevel1:
         self.Scrolledtext1.bind('<Control-S>', self.save_as)
         root.bind('<F9>', self.compile)
         root.bind('<F8>', self.debug)
-        root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
-        root.bind('<Key>', self.statusbar.update_statusbar)
-        root.bind('<Motion>', self.statusbar.update_statusbar)
+        
         self.Scrolledtext1.bind('<Key>', self.statusbar.update_parent_title)
+        root.bind('<ButtonRelease-1>', self.update_rowCount)
+        root.bind('<Key>', self.update_rowCount)
+        root.bind('<Motion>', self.update_rowCount)
         root.bind('<MouseWheel>', self.update_rowCount)
-        root.bind('<Button-1>', self.update_rowCount)
+
+        self.Scrolledtext1.bind('<Configure>',self.statusbar.update_statusbar)
+        #root.bind('<Button-1>', self.statusbar.update_statusbar)
+        #root.bind('<Key>', self.statusbar.update_statusbar)
+        #root.bind('<Motion>', self.statusbar.update_statusbar)
+        #root.bind('<MouseWheel>', self.statusbar.update_statusbar)
 
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
-        nLineas = int(coordenadas[0]) - 1
+        nLineas = int(coordenadas[0])
         #print(nLineas)
         cadNums = str()
         for l in range(1,nLineas):
@@ -612,7 +619,7 @@ class Toplevel1:
         self.Text1.insert(tk.END, cadNums)
         self.Text1.config(state=tk.DISABLED)
         self.Text1.yview_moveto(self.scroll.get()[0])
-        #print(self.scroll.get())
+        #print(self.Scrolledtext1._autoscroll)
     #
 
 class Statusbar:
