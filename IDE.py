@@ -617,9 +617,16 @@ class Toplevel1:
         self.Text1.config(state=tk.NORMAL)
         self.Text1.delete(1.0, tk.END)
         self.Text1.insert(tk.END, cadNums)
+        #self.Text1.yview_moveto(self.scroll.yview)
         self.Text1.config(state=tk.DISABLED)
-        self.Text1.yview_moveto(self.scroll.get()[0])
-        #print(self.Scrolledtext1._autoscroll)
+        #print self.scroll.get()[0]
+        #scroll_position = 
+        self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
+        #print self.Scrolledtext1.yview()[0]
+        #print vars(self.Scrolledtext1.tk)
+        #print(self.Scrolledtext1.vertical_scroll.yview)
+        #self.Text1.yview_moveto(self.Scrolledtext1.yview)
+        #print(self.scroll.get())
     #
 
 class Statusbar:
@@ -658,6 +665,7 @@ class AutoScroll(object):
         #  scrolling is not supported. 5/7/14.
         try:
             vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
+            self.vertical_scroll = vsb
         except:
             pass
         hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
@@ -715,12 +723,14 @@ class ScrolledText(AutoScroll, tk.Text):
     automatically show/hide as needed.'''
     @_create_container
     def __init__(self, master, **kw):
-        tk.Text.__init__(self, master, **kw)
-        AutoScroll.__init__(self, master)
+        tk.Text.__init__(self, master, **kw)#.__init__
+        AutoScroll.__init__(self, master)#.__init__
+
 
 import platform
 def _bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
+    #print(child)
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
         child.bind_all('<MouseWheel>', lambda e: _on_mousewheel(e, child))
         child.bind_all('<Shift-MouseWheel>', lambda e: _on_shiftmouse(e, child))
