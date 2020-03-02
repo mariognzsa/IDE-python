@@ -107,7 +107,21 @@ class Toolbar:
 
 		toolbar.add_cascade(label = 'Archivo', menu = file_dropdown)
 
-		#For the compile button
+		#Edit dropdown menu
+		edit_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
+		edit_dropdown.add_command(
+			label = 'Deshacer',
+			accelerator = 'Ctrl+Z',
+			command = parent.undo
+		)
+		edit_dropdown.add_command(
+			label = 'Rehacer',
+			accelerator = 'Ctrl+Y',
+			command = parent.redo
+		)
+		toolbar.add_cascade(label = 'Editar', menu = edit_dropdown)
+
+		#Adding the compile dropdown menu
 		compile_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
 		compile_dropdown.add_command(
 			label = 'Depurar',
@@ -120,13 +134,12 @@ class Toolbar:
 		)
 		toolbar.add_cascade(label = 'Proyecto', menu = compile_dropdown)
 		
-		#btn_new_file = Button(toolbar, image = img_new_file, height = 30, width = 30)
-		toolbar.add_separator()
+		#File related buttons
 		toolbar.add_command(image = self.img_new_file, command = parent.new_file)
 		toolbar.add_command(image = self.img_open, command = parent.open_file)
 		toolbar.add_command(image = self.img_save, command = parent.save)
 		toolbar.add_command(image = self.img_save_as, command = parent.save_as)
-		toolbar.add_separator()
+		#Proyect related buttons
 		toolbar.add_command(image = self.img_debug, command = parent.debug)
 		toolbar.add_command(image = self.img_compile, command = parent.compile)
 
@@ -287,6 +300,12 @@ class TextEditor:
 
 	def debug(self):
 		os.system('echo "Depurando..."')
+
+	def undo(self):
+		self.textarea.edit_undo()
+
+	def redo(self):
+		self.textarea.edit_redo()
 
 
 
