@@ -1,5 +1,8 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import filedialog
+import os
+from PIL import Image, ImageTk
+
 
 ## Class that manages the bottom-left status bar
 
@@ -8,28 +11,39 @@ class Statusbar:
 	def __init__(self, parent):
 		self.parent = parent
 		font_specs = ('Ubuntu', 10)
-		self.status = tk.StringVar()
-		self.status.set('MaKen TextEditor - 0.1')
-		label = tk.Label(
-			parent.textarea, 
+		self.status = StringVar()
+		coordenadas = self.parent.textarea.index(INSERT).split('.')
+		cool = coordenadas[0]
+		cooc = int(coordenadas[1]) +1
+		self.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
+		label = Label(
+			parent.frameCode, 
 			textvariable = self.status, 
 			fg = 'black', 
 			bg = 'lightgrey', 
 			anchor = 'sw',
 			font = font_specs
 		)
-		label.pack(side = tk.BOTTOM, fill = tk.BOTH)
+		#label.pack(side = BOTTOM, fill = BOTH)
+		label.grid(row=1, columnspan=3, sticky=E+W+S)
 
 	## Update method for the label
 	def update_statusbar(self, *args):
-	
-		if isinstance(args[0], bool):
-			self.status.set('MaKen TextEditor - 0.1 (Cambios guardados con exito)')
-			self.parent.set_window_title(self.parent.filename)
-		else:
-			self.status.set('MaKen TextEditor - 0.1 (Cambios sin guardar)')
-			self.parent.set_window_title(self.parent.filename + '*')
+		coordenadas = self.parent.textarea.index(INSERT).split('.')
+		cool = coordenadas[0]
+		cooc = int(coordenadas[1]) +1
+		self.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
 
+	def update_parent_title(self, *args):
+		if self.parent.filename:
+			self.parent.set_window_title(str(self.parent.filename) + '*')
+		else:
+			self.parent.set_window_title('Sin titulo* ')
+		self.update_statusbar()
+
+	def update_saved_changes(self, *args):
+		self.status.set(self.status.get() + ' (Cambios guardados con exito)')
+		self.parent.set_window_title(self.parent.filename)
 
 
 
@@ -39,10 +53,35 @@ class Toolbar:
 	def __init__(self, parent):
 		font_specs = ('ubuntu', 12)
 
-		toolbar = tk.Menu(parent.master)
+		toolbar = Menu(parent.master)
 		parent.master.config(menu = toolbar)
 
-		file_dropdown = tk.Menu(toolbar, font = font_specs, tearoff = 0)
+		# Image files
+		self.image = Image.open("img/file-multiple.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_new_file = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/content-save.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_save = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/content-save-edit.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_save_as = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/folder-open.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_open = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/play-pause.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_compile = ImageTk.PhotoImage(self.image)
+
+		self.image = Image.open("img/bug-check-outline.png")
+		self.image = self.image.resize((18,18), Image.ANTIALIAS)
+		self.img_debug = ImageTk.PhotoImage(self.image)
+
+		file_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
 		file_dropdown.add_command(
 			label = 'Nuevo Archivo', 
 			accelerator = 'Ctrl+N',
@@ -68,6 +107,43 @@ class Toolbar:
 
 		toolbar.add_cascade(label = 'Archivo', menu = file_dropdown)
 
+		#Edit dropdown menu
+		edit_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
+		edit_dropdown.add_command(
+			label = 'Deshacer',
+			accelerator = 'Ctrl+Z',
+			command = parent.undo
+		)
+		edit_dropdown.add_command(
+			label = 'Rehacer',
+			accelerator = 'Ctrl+Y',
+			command = parent.redo
+		)
+		toolbar.add_cascade(label = 'Editar', menu = edit_dropdown)
+
+		#Adding the compile dropdown menu
+		compile_dropdown = Menu(toolbar, font = font_specs, tearoff = 0)
+		compile_dropdown.add_command(
+			label = 'Depurar',
+			command = parent.debug
+		)
+		compile_dropdown.add_command(
+			label = 'Compilar', 
+			accelerator = 'F9',
+			command = parent.compile
+		)
+		toolbar.add_cascade(label = 'Proyecto', menu = compile_dropdown)
+		
+		#File related buttons
+		toolbar.add_command(image = self.img_new_file, command = parent.new_file)
+		toolbar.add_command(image = self.img_open, command = parent.open_file)
+		toolbar.add_command(image = self.img_save, command = parent.save)
+		toolbar.add_command(image = self.img_save_as, command = parent.save_as)
+		#Proyect related buttons
+		toolbar.add_command(image = self.img_debug, command = parent.debug)
+		toolbar.add_command(image = self.img_compile, command = parent.compile)
+
+
 
 ### Controller class
 
@@ -82,17 +158,63 @@ class TextEditor:
 		self.filename = None
 		self.set_window_title()
 
-		self.textarea = tk.Text(master, font = font_specs)
-		self.scroll = tk.Scrollbar(master, command = self.textarea.yview)
-		self.textarea.configure(yscrollcommand = self.scroll.set)
-		self.textarea.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
-		self.scroll.pack(side = tk.RIGHT, fill = tk.Y)
+		self.content = Frame(self.master)
+		self.frameCode = Frame(self.content)
 
+		self.rowCount = Text(
+			self.frameCode, 
+			fg = 'grey35',
+			bg = 'lightgrey',
+			font = font_specs
+		)
+		
+		self.rowCount.grid(row=0, column=0, sticky=N+S)
+
+		self.textarea = Text(
+			self.frameCode, 
+			font = font_specs, 
+			undo = True,
+			autoseparators = True, 
+			maxundo = -1
+		)
+		
+		self.scroll = Scrollbar(self.frameCode, command = self.textarea.yview)
+		self.textarea.configure(yscrollcommand = self.scroll.set)
+		self.textarea.grid(row=0, column=1)
+		self.scroll.grid(row=0, column=2, sticky=N+S)
+		
+		self.frameCode.grid_propagate(False)
+		self.frameCode.grid_columnconfigure(0, weight=1)  
+		self.frameCode.grid_rowconfigure(0, weight=1)  
+		#self.frameCode.grid(row=0, column=0, columnspan=1, sticky=E+W+N+S)
+		self.frameCode.place(relheight=.80, relwidth=1)
+
+		self.content.grid_propagate(False)
+		self.content.grid_columnconfigure(0, weight=1)  
+		self.content.grid_rowconfigure(0, weight=1)
+		self.content.place(relheight=1, relwidth=1)
+		
 		self.toolbar = Toolbar(self)
 
 		self.statusbar = Statusbar(self)
+		self.update_rowCount(self)
 
 		self.bind_shortcuts()
+		self.textarea.focus()
+
+	def update_rowCount(self, *args):
+		coordenadas = self.textarea.index(END).split('.')
+		nLineas = int(coordenadas[0]) - 1
+		print(nLineas)
+		cadNums = str()
+		for l in range(1,nLineas):
+			cadNums += str(l) + "\n"
+		self.rowCount.config(state=NORMAL)
+		self.rowCount.delete(1.0, END)
+		self.rowCount.insert(END, cadNums)
+		self.rowCount.config(state=DISABLED)
+		self.rowCount.yview_moveto(self.scroll.get()[0])
+		#self.rowCount.configure(YView)
 
 	def set_window_title(self, name = None):
 		if name:
@@ -101,7 +223,7 @@ class TextEditor:
 			self.master.title('Sin titulo - MaKen TextEditor')
 
 	def new_file(self, *args):
-		self.textarea.delete(1.0, tk.END)
+		self.textarea.delete(1.0, END)
 		self.filename = None
 		self.set_window_title()	
 
@@ -117,18 +239,19 @@ class TextEditor:
 		)
 
 		if self.filename:
-			self.textarea.delete(1.0, tk.END)
+			self.textarea.delete(1.0, END)
 			with open(self.filename, 'r') as file:
 				self.textarea.insert(1.0, file.read())
 			self.set_window_title(self.filename)
+			self.textarea.mark_set('insert', '1.0')
 
 	def save(self, *args):
 		if self.filename:
 			try:
-				textarea_content = self.textarea.get(1.0, tk.END)
+				textarea_content = self.textarea.get(1.0, END)
 				with open(self.filename, 'w') as file:
 					file.write(textarea_content)
-				self.statusbar.update_statusbar(True)
+				self.statusbar.update_saved_changes()
 
 			except Exception as e:
 				print(e)
@@ -148,12 +271,12 @@ class TextEditor:
 							('HTML Documents', '*.html'),
 							('CSS Documents', '*.css')]
 			)
-			textarea_content = self.textarea.get(1.0, tk.END)
+			textarea_content = self.textarea.get(1.0, END)
 			with open(new_file, 'w') as file:
 				file.write(textarea_content)
 			self.filename = new_file
 			self.set_window_title(self.filename)
-			self.statusbar.update_statusbar(True)
+			self.statusbar.update_saved_changes()
 
 		except Exception as e:
 			print(e)
@@ -163,12 +286,30 @@ class TextEditor:
 		self.textarea.bind('<Control-o>', self.open_file)
 		self.textarea.bind('<Control-s>', self.save)
 		self.textarea.bind('<Control-S>', self.save_as)
-		self.textarea.bind('<Key>', self.statusbar.update_statusbar)
+		self.master.bind('<F9>', self.compile)
+		self.master.bind('<F8>', self.debug)
+		self.master.bind('<Button-1>', self.statusbar.update_statusbar)
+		self.master.bind('<Key>', self.statusbar.update_statusbar)
+		self.textarea.bind('<Key>', self.statusbar.update_parent_title)
+		self.master.bind('<Motion>', self.statusbar.update_statusbar)
+		self.master.bind('<MouseWheel>', self.update_rowCount)
+		self.master.bind('<Button-1>', self.update_rowCount)
 
+	def compile(self, *args):
+		os.system('echo "Compilando..."')
+
+	def debug(self):
+		os.system('echo "Depurando..."')
+
+	def undo(self):
+		self.textarea.edit_undo()
+
+	def redo(self):
+		self.textarea.edit_redo()
 
 
 
 if __name__ == '__main__':
-	master = tk.Tk()
+	master = Tk()
 	textEditor = TextEditor(master)
 	master.mainloop()

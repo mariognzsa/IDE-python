@@ -1,0 +1,14 @@
+git branch   (ver en que rama estas)
+git status   (ver estado de la rama)
+git add <archivo/s>     (Agregar cambios a la rama)
+git commit -m "<mensaje de commit>"  (hace un commit con los cambios de la rama local)
+git push <origin> <nombre de rama>  (hace los cambios al repositorio en linea)
+git checkout <rama a la que se desea cambiar>
+Para traer los cambios de master:
+{
+	git checkout <rama master>
+	git pull (Jala los cambios de la rama a tu local)
+	git checkout <tu rama>
+	git merge master (Combina tu rama con la master que esta 		actualizada ya)
+	git push origin <tu rama> actualizar cambios en GitLab
+}
