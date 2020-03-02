@@ -22,6 +22,7 @@ except ImportError:
 import IDE_support
 from tkinter import filedialog
 import os
+from PIL import Image, ImageTk
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -183,42 +184,80 @@ class Toplevel1:
                 label="Depurar",
                 accelerator='F8',
                 command=self.debug)
+
+        # Image files
+        self.image = Image.open("img/file-multiple.png")
+        self.image = self.image.resize((18,18), Image.ANTIALIAS)
+        self.img_new_file = ImageTk.PhotoImage(self.image)
+
+        self.image = Image.open("img/content-save.png")
+        self.image = self.image.resize((18,18), Image.ANTIALIAS)
+        self.img_save = ImageTk.PhotoImage(self.image)
+
+        self.image = Image.open("img/content-save-edit.png")
+        self.image = self.image.resize((18,18), Image.ANTIALIAS)
+        self.img_save_as = ImageTk.PhotoImage(self.image)
+
+        self.image = Image.open("img/folder-open.png")
+        self.image = self.image.resize((18,18), Image.ANTIALIAS)
+        self.img_open = ImageTk.PhotoImage(self.image)
+
+        self.image = Image.open("img/play-pause.png")
+        self.image = self.image.resize((18,18), Image.ANTIALIAS)
+        self.img_compile = ImageTk.PhotoImage(self.image)
+
+        self.image = Image.open("img/bug-check-outline.png")
+        self.image = self.image.resize((18,18), Image.ANTIALIAS)
+        self.img_debug = ImageTk.PhotoImage(self.image)
+
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label="1")
+                image = self.img_new_file,
+                label = 'Nuevo',
+                command = self.new_file)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label="2")
+                image = self.img_open,
+                label = 'Abrir',
+                command = self.open_file)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label="3")
+                image = self.img_save,
+                label = 'Guardar',
+                command = self.save)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label="4")
+                image = self.img_save_as,
+                label = 'Guardar como',
+                command = self.save_as)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label="5")
+                image = self.img_compile,
+                label = 'Compilar',
+                command = self.compile)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label="6")
+                image = self.img_debug,
+                label = 'Depurar',
+                command = self.debug)
 
         self.style.configure('TNotebook.Tab', background=_bgcolor)
         self.style.configure('TNotebook.Tab', foreground=_fgcolor)
