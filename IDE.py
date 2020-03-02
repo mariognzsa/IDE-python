@@ -453,16 +453,18 @@ class Toplevel1:
         self.Text1.configure(selectforeground="black")
         self.Text1.configure(wrap="word")
 
+        self.status = tk.StringVar()
         self.Label1 = tk.Label(top, anchor = 'ne')
-        self.Label1.place(relx=0.47, rely=0.66, height=19, width=246)
+        self.Label1.place(relx=0.47, rely=0.67, height=19, width=246)
         self.Label1.configure(background="#d9d9d9")
         self.Label1.configure(disabledforeground="#a3a3a3")
         self.Label1.configure(foreground="#000000")
         self.Label1.configure(justify='left')
-        self.Label1.configure(text='''Label Lineas''')
+        self.Label1.configure(textvariable=self.status)
 
         self.filename = None
         self.set_window_title()
+        self.statusbar = Statusbar(self)
         self.bind_shortcuts()
         self.Scrolledtext1.focus()
 
@@ -495,6 +497,7 @@ class Toplevel1:
             self.set_window_title(self.filename)
             self.Scrolledtext1.mark_set('insert', '1.0')
         self.update_rowCount()
+        self.statusbar.update_statusbar()
 
     def save(self, *args):
         if self.filename:
@@ -502,7 +505,7 @@ class Toplevel1:
                 textarea_content = self.Scrolledtext1.get(1.0, tk.END)
                 with open(self.filename, 'w') as file:
                     file.write(textarea_content)
-                #self.statusbar.update_saved_changes()
+                self.statusbar.update_saved_changes()
                 
             except Exception as e:
                 print(e)
@@ -551,10 +554,10 @@ class Toplevel1:
         self.Scrolledtext1.bind('<Control-S>', self.save_as)
         root.bind('<F9>', self.compile)
         root.bind('<F8>', self.debug)
-        #root.bind('<Button-1>', self.statusbar.update_statusbar)
-        #root.bind('<Key>', self.statusbar.update_statusbar)
-        #self.Scrolledtext1.bind('<Key>', self.statusbar.update_parent_title)
-        #root.bind('<Motion>', self.statusbar.update_statusbar)
+        root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
+        root.bind('<Key>', self.statusbar.update_statusbar)
+        root.bind('<Motion>', self.statusbar.update_statusbar)
+        self.Scrolledtext1.bind('<Key>', self.statusbar.update_parent_title)
         root.bind('<MouseWheel>', self.update_rowCount)
         root.bind('<Button-1>', self.update_rowCount)
 
@@ -572,6 +575,33 @@ class Toplevel1:
         self.Text1.yview_moveto(self.scroll.get()[0])
         #print(self.scroll.get())
     #
+
+class Statusbar:
+    
+    def __init__(self, parent):
+        self.parent = parent
+        coordenadas = self.parent.Scrolledtext1.index(tk.INSERT).split('.')
+        cool = coordenadas[0]
+        cooc = int(coordenadas[1]) + 1
+        self.parent.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
+
+	## Update method for the label
+    def update_statusbar(self, *args):
+        coordenadas = self.parent.Scrolledtext1.index(tk.INSERT).split('.')
+        cool = coordenadas[0]
+        cooc = int(coordenadas[1]) + 1
+        self.parent.status.set('linea ' + str(cool) + ', columna ' + str(cooc))
+
+    def update_parent_title(self, *args):
+        if self.parent.filename:
+            self.parent.set_window_title(str(self.parent.filename) + '*')
+        else:
+            self.parent.set_window_title('Sin titulo* ')
+        self.update_statusbar()
+        
+    def update_saved_changes(self, *args):
+        self.parent.status.set(self.parent.status.get() + ' (Cambios guardados con exito)')
+        self.parent.set_window_title(self.parent.filename)
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
