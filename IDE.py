@@ -258,6 +258,24 @@ class Toplevel1:
                 image = self.img_debug,
                 label = 'Depurar',
                 command = self.debug)
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Lexico')
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Sintactico')
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Semantico')
 
         self.style.configure('TNotebook.Tab', background=_bgcolor)
         self.style.configure('TNotebook.Tab', foreground=_fgcolor)
@@ -588,6 +606,8 @@ class Toplevel1:
         self.Scrolledtext1.edit_redo()
     
     def bind_shortcuts(self):
+        root.bind('<4>', self.update_rowCount)
+        root.bind('<5>', self.update_rowCount)
         self.Scrolledtext1.bind('<Control-n>', self.new_file)
         self.Scrolledtext1.bind('<Control-o>', self.open_file)
         self.Scrolledtext1.bind('<Control-s>', self.save)
@@ -596,13 +616,15 @@ class Toplevel1:
         root.bind('<F8>', self.debug)
         
         self.Scrolledtext1.bind('<Key>', self.statusbar.update_parent_title)
-        root.bind('<Button-1>', self.update_rowCount)
+        root.bind('<1>', self.update_rowCount)
         root.bind('<Key>', self.update_rowCount)
-        root.bind('<Motion>', self.update_rowCount)
-        root.bind('<MouseWheel>', self.update_rowCount)
+        #root.bind('<Motion>', self.update_rowCount)
+        #root.bind('<MouseWheel>', self.update_rowCount)
 
         root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
         root.bind('<KeyRelease>', self.statusbar.update_statusbar)
+        root.bind('<Motion>', self.statusbar.update_statusbar)
+        #root.bind('<MouseWheel>', self.statusbar.update_statusbar)
 
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
