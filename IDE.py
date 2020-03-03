@@ -258,6 +258,24 @@ class Toplevel1:
                 image = self.img_debug,
                 label = 'Depurar',
                 command = self.debug)
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Lexico')
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Sintactico')
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Semantico')
 
         self.style.configure('TNotebook.Tab', background=_bgcolor)
         self.style.configure('TNotebook.Tab', foreground=_fgcolor)
