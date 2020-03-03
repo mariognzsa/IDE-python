@@ -603,8 +603,6 @@ class Toplevel1:
 
         root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
         root.bind('<KeyRelease>', self.statusbar.update_statusbar)
-        root.bind('<Motion>', self.statusbar.update_statusbar)
-        root.bind('<MouseWheel>', self.statusbar.update_statusbar)
 
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
