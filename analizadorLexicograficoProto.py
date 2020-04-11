@@ -9,8 +9,10 @@ def main(argv):
     #new_file.close()
     
     # Hardcoded input if empty
-    if argv[0] == ''
+    if argv[0] == '':
         inputCode = 'if else jajaja /*** esto es* jajaja **/ //comentariooooooo\n aqui valio dick 123.123 12 123..123..2'
+    else:
+        inputCode = argv[0]
     print(inputCode)
     state = 0
     restricted = [  # List of restricted words
