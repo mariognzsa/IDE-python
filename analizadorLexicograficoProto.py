@@ -25,6 +25,7 @@ def main(argv):
     tokens = []  # Array of founded tokens
     currentToken = ''
     cIndex = 0   # index for current character
+    tkIndex = 0 #  index for the current token
     while cIndex < len(inputCode):
         # print('char: ' + inputCode[cIndex] + ' state: ' + str(state))  #debug current character and the state
 
@@ -69,6 +70,7 @@ def main(argv):
                 tokens.append(tokenInfo)
                 tokenType = ''
                 currentToken = ''
+                tkIndex += 1
         cIndex += 1    
             
     for token in tokens:
