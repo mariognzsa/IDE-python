@@ -3,8 +3,15 @@
 import sys, getopt
 
 def main(argv):
+    #filename = argv[0]
+    #new_file = open(filename, 'r')
+    #inputCode = str(new_file.read()) # Getting first argument as the whole string of code
+    #new_file.close()
     
-    inputCode = argv[0] # Getting first argument as the whole string of code
+    # Hardcoded input if empty
+    if argv[0] == ''
+        inputCode = 'if else jajaja /*** esto es* jajaja **/ //comentariooooooo\n aqui valio dick 123.123 12 123..123..2'
+    print(inputCode)
     state = 0
     restricted = [  # List of restricted words
         'main', 
@@ -22,6 +29,7 @@ def main(argv):
     ]
     charset = 'abcdefghijklmnopqrstuvwxyz' # array permitted for identifier's first character
     charsetExtended = 'abcdefghijklmnopqrstuvwxyz_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    numbers = '0123456789'
     tokens = []  # Array of founded tokens
     currentToken = ''
     cIndex = 0   # index for current character
@@ -38,6 +46,24 @@ def main(argv):
                     cIndex += 1
                 tokenType = 'identifier'
 
+            elif inputCode[cIndex] in numbers: # Checking for number appearances
+                currentToken += inputCode[cIndex]
+                cIndex += 1
+                number = True
+                decimalPoints = 0
+                while number and decimalPoints <= 1:  # Loop just for numbers and one decimalpoint max
+                    if inputCode[cIndex] in numbers:
+                        currentToken += inputCode[cIndex]
+                        cIndex += 1
+                    elif inputCode[cIndex] == '.':
+                        if decimalPoints < 1 and inputCode[cIndex+1] in numbers:
+                            currentToken += inputCode[cIndex]                            
+                        cIndex += 1
+                        decimalPoints += 1
+                    else:
+                        number = False
+                tokenType = 'digit'
+
             elif inputCode[cIndex] == '/': # Checking for commentary lines
                 cIndex += 1
                 if inputCode[cIndex] == '/': # case // for one line comments
@@ -50,17 +76,17 @@ def main(argv):
                     cIndex += 1
                     commentary = False
                     while commentary == False and cIndex < len(inputCode): # Loop multiline comments
-                        if inputCode[cIndex] == '*':
+                        if inputCode[cIndex] != '*':
+                            currentToken += inputCode[cIndex]
                             cIndex += 1
-                            if inputCode[cIndex] == '/':
+                        else:
+                            if inputCode[cIndex+1] == '/':
                                 cIndex += 1
                                 commentary = True
                             else:
+                                currentToken += inputCode[cIndex]
                                 cIndex += 1
-                                currentToken += '*'
-                        else:
-                            currentToken += inputCode[cIndex]
-                            cIndex += 1
+
                     tokenType = 'multiline_commentary'
 
             if len(currentToken) > 0 and tokenType != '': # Checking token and tokentype not empty
