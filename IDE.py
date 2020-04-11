@@ -20,8 +20,12 @@ except ImportError:
     py3 = True
 
 import IDE_support
-from tkinter import filedialog
+try:
+    from tkinter import filedialog
+except ImportError:
+    import tkFileDialog as filedialog
 import os
+import PIL
 from PIL import Image, ImageTk
 
 def vp_start_gui():
