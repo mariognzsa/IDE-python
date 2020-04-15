@@ -28,6 +28,8 @@ import os
 import PIL
 from PIL import Image, ImageTk
 
+from lexicAnalizer import LexicAnalizer, Token
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -55,6 +57,7 @@ def destroy_Toplevel1():
 
 class Toplevel1:
     def __init__(self, top=None):
+        self.analizer = LexicAnalizer()   # Initializing the lexic analizer
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -623,6 +626,9 @@ class Toplevel1:
         self.Text1.insert(tk.END, cadNums.strip('\n'))
         self.Text1.config(state=tk.DISABLED)
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
+        self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
+        for token in self.analizer.tokens:
+            print('id: '+str(token.id)+'|| type: '+str(token.tokenType)+'|| token: '+str(token.token)+'|| start: '+str(token.start)+'|| end: '+str(token.end))
     #
 
 class Statusbar:
