@@ -657,7 +657,6 @@ class Toplevel1:
         self.Scrolledtext3.delete(1.0, tk.END)
         for token in self.analizer.tokens:
             self.Scrolledtext1.tag_remove(str(token.id), "1.0", 'end')
-        for token in self.analizer.tokens:
             self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+" ["+self.pos_to_rowcol(token.start)+"-"+self.pos_to_rowcol(token.end)+"]\n")
             self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
             self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
