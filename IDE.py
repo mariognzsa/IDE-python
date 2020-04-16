@@ -523,9 +523,10 @@ class Toplevel1:
             root.title('Sin titulo - MaKen TextEditor')
 
     def new_file(self, *args):
-	    self.Scrolledtext1.delete(1.0, tk.END)
-	    self.filename = None
-	    self.set_window_title()
+        self.Scrolledtext1.delete(1.0, tk.END)
+        self.filename = None
+        self.set_window_title()
+        self.update_rowCount()
     
     def open_file(self, *args):
         self.filename = filedialog.askopenfilename(
