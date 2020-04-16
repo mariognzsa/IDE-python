@@ -612,8 +612,34 @@ class Toplevel1:
 
         root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
         root.bind('<KeyRelease>', self.statusbar.update_statusbar)
-        #root.bind('<Motion>', self.statusbar.update_statusbar)
+        root.bind('<Motion>', self.statusbar.update_statusbar)
         #root.bind('<MouseWheel>', self.statusbar.update_statusbar)
+
+    def wordColor(self, type):
+        if (type == "identifier"):
+            return "black"
+        elif (type == "integer" or type == "float"):
+            return "deeppink"
+        elif (type == "oneline_commentary" or type == "multiline_commentary"):
+            return "gray"
+        elif (type == "restricted_word"):
+            return "blue"
+        elif (type == "operator" or type == "special_character"):
+            return "green"
+
+    def pos_to_rowcol(self, pos):
+        rcount=1
+        ccount=-1
+        count=0
+        text=self.Scrolledtext1.get(1.0, tk.END)
+        while (count<=pos):
+            if (text[count] == '\n'):
+                ccount=-1
+                rcount+=1
+            else:
+                ccount+=1
+            count+=1
+        return str(rcount)+"."+str(ccount)
 
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
@@ -627,9 +653,13 @@ class Toplevel1:
         self.Text1.config(state=tk.DISABLED)
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
         self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
+        self.Scrolledtext3.delete(1.0, tk.END)
         for token in self.analizer.tokens:
-            print('id: '+str(token.id)+'|| type: '+str(token.tokenType)+'|| token: '+str(token.token)+'|| start: '+str(token.start)+'|| end: '+str(token.end))
-    #
+            self.Scrolledtext1.tag_remove(str(token.id), "1.0", 'end')
+        for token in self.analizer.tokens:
+            self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+" ["+self.pos_to_rowcol(token.start)+"-"+self.pos_to_rowcol(token.end)+"]\n")
+            self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
+            self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
 
 class Statusbar:
     
