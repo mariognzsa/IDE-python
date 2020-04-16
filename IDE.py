@@ -629,12 +629,12 @@ class Toplevel1:
 
     def pos_to_rowcol(self, pos):
         rcount=1
-        ccount=-1
+        ccount=0
         count=0
         text=self.Scrolledtext1.get(1.0, tk.END)
-        while (count<=pos):
+        while (count<pos):
             if (text[count] == '\n'):
-                ccount=-1
+                ccount=0
                 rcount+=1
             else:
                 ccount+=1
