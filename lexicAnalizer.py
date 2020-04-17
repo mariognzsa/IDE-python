@@ -54,6 +54,7 @@ class LexicAnalizer:
                         cIndex += 1
                     tokenType = 'identifier'
                     tokenEnd = cIndex
+                    cIndex -= 1
 
                 elif inputCode[cIndex] in numbers: # Checking for number appearances
                     currentToken += inputCode[cIndex]
@@ -80,7 +81,8 @@ class LexicAnalizer:
                     else:
                         tokenType = 'integer'
                     tokenEnd = cIndex
-
+                    cIndex -= 1
+                    
                 elif inputCode[cIndex] == '/' and (inputCode[cIndex+1] == '/' or inputCode[cIndex+1] == '*'): # Checking for commentary lines
                     tokenStart = cIndex
                     cIndex += 1
@@ -150,6 +152,7 @@ class LexicAnalizer:
                         currentToken += inputCode[cIndex]
                     tokenType = 'operator'
                     tokenEnd = cIndex
+                    cIndex -= 1
                     
                 elif inputCode[cIndex] not in charsetExtended and inputCode[cIndex] not in numbers and inputCode[cIndex] not in operators and inputCode[cIndex] not in spacesAndStuff:
                     # Considered special character if not in the above alphabets
