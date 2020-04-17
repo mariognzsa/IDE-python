@@ -609,7 +609,7 @@ class Toplevel1:
         root.bind('<1>', self.update_rowCount)
         root.bind('<Key>', self.update_rowCount)
         #root.bind('<Motion>', self.update_rowCount)
-        #root.bind('<MouseWheel>', self.update_rowCount)
+        #root.bind('<MouseWheel>', self.update_rowCount) 
 
         root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
         root.bind('<KeyRelease>', self.statusbar.update_statusbar)
@@ -655,8 +655,9 @@ class Toplevel1:
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
         self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
         self.Scrolledtext3.delete(1.0, tk.END)
+        for tag in self.Scrolledtext1.tag_names():
+            self.Scrolledtext1.tag_delete(tag)
         for token in self.analizer.tokens:
-            self.Scrolledtext1.tag_remove(str(token.id), "1.0", 'end')
             self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+" ["+self.pos_to_rowcol(token.start)+"-"+self.pos_to_rowcol(token.end)+"]\n")
             self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
             self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
