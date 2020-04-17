@@ -82,78 +82,94 @@ class LexicAnalizer:
                         tokenType = 'integer'
                     tokenEnd = cIndex
                     cIndex -= 1
-                    
-                elif inputCode[cIndex] == '/' and (inputCode[cIndex+1] == '/' or inputCode[cIndex+1] == '*'): # Checking for commentary lines
-                    tokenStart = cIndex
-                    cIndex += 1
-                    if inputCode[cIndex] == '/': # case // for one line comments
-                        cIndex += 1
-                        while inputCode[cIndex] != '\n':
-                            currentToken += inputCode[cIndex]
-                            cIndex += 1
-                        tokenType = 'oneline_commentary'
-                    elif inputCode[cIndex] == '*': # case /* for multiline comments
-                        cIndex += 1
-                        commentary = False
-                        while commentary == False and cIndex < len(inputCode): # Loop multiline comments
-                            if inputCode[cIndex] != '*':
-                                currentToken += inputCode[cIndex]
-                                cIndex += 1
-                            else:
-                                if inputCode[cIndex+1] == '/':
-                                    cIndex += 1
-                                    commentary = True
-                                else:
-                                    currentToken += inputCode[cIndex]
-                                    cIndex += 1
-
-                        tokenType = 'multiline_commentary'
-                    tokenEnd = cIndex
 
                 elif inputCode[cIndex] in operators: # Checking if is an operator, btw unnecessary cases lol
                     tokenStart = cIndex
                     if inputCode[cIndex] == '<':
+                        tokenType = 'operator'
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=':
                             currentToken += inputCode[cIndex]
                             cIndex += 1
                     elif inputCode[cIndex] == '>':
+                        tokenType = 'operator'
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=':
                             currentToken += inputCode[cIndex]
                             cIndex += 1
                     elif inputCode[cIndex] == '=':
+                        tokenType = 'operator'
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=':
                             currentToken += inputCode[cIndex]
                             cIndex += 1
                     elif inputCode[cIndex] == '!':
+                        tokenType = 'operator'
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=':
                             currentToken += inputCode[cIndex]
                             cIndex += 1
                     elif inputCode[cIndex] == '+':
+                        tokenType = 'operator'
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=' or inputCode[cIndex] == '+': # special cases for ++ and +=, considering them as operators
                             currentToken += inputCode[cIndex]
                             cIndex += 1
                     elif inputCode[cIndex] == '-':
+                        tokenType = 'operator'
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=' or inputCode[cIndex] == '-':
                             currentToken += inputCode[cIndex]
                             cIndex += 1
+                    elif inputCode[cIndex] == '*':
+                        tokenType = 'operator'
+                        currentToken += inputCode[cIndex]
+                        cIndex += 1
+                    elif inputCode[cIndex] == '/':
+                        tokenType = 'operator'
+                        cIndex += 1
+                        if inputCode[cIndex] != '/' and inputCode[cIndex] != '*':
+                            currentToken += inputCode[cIndex-1]
+                        if inputCode[cIndex] == '/': # case // for one line comments
+                            cIndex += 1
+                            if inputCode[cIndex] == '\n':
+                                currentToken = ' '
+                            while inputCode[cIndex] != '\n':
+                                currentToken += inputCode[cIndex]
+                                cIndex += 1
+                            tokenType = 'oneline_commentary'
+                        elif inputCode[cIndex] == '*': # case /* for multiline comments
+                            cIndex += 1
+                            commentary = False
+                            if inputCode[cIndex] == '\n':
+                                currentToken = ' \n'
+                                cIndex += 1
+                                commentary = True
+                            while commentary == False and cIndex < len(inputCode): # Loop multiline comments
+                                if inputCode[cIndex] != '*':
+                                    currentToken += inputCode[cIndex]
+                                    cIndex += 1
+                                else:
+                                    if inputCode[cIndex+1] == '/':
+                                        cIndex += 2
+                                        currentToken += inputCode[cIndex]
+                                        commentary = True
+                                    else:
+                                        currentToken += inputCode[cIndex]
+                                        cIndex += 1
+                            currentToken = currentToken[0:len(currentToken)-1]
+                            tokenType = 'multiline_commentary'
                     else:                                       # if not one of above, no need in checking for further chars
                         currentToken += inputCode[cIndex]
-                    tokenType = 'operator'
                     tokenEnd = cIndex
                     cIndex -= 1
-                    
+
                 elif inputCode[cIndex] not in charsetExtended and inputCode[cIndex] not in numbers and inputCode[cIndex] not in operators and inputCode[cIndex] not in spacesAndStuff:
                     # Considered special character if not in the above alphabets
                     tokenStart = cIndex
