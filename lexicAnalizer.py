@@ -33,8 +33,9 @@ class LexicAnalizer:
         charset = 'abcdefghijklmnopqrstuvwxyz' # array permitted for identifier's first character
         charsetExtended = 'abcdefghijklmnopqrstuvwxyz_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         numbers = '0123456789'
-        operators = '+-<>=|!/*'
+        operators = '+-<>=|!/*:'
         spacesAndStuff = ' \n'  # Pls rename later
+        specialCharacters = '}{)(][#$%&'
         self.tokens = []  # Array of found tokens
         currentToken = ''
         tokenStart = 0
@@ -99,11 +100,11 @@ class LexicAnalizer:
                         if inputCode[cIndex] == '=':
                             currentToken += inputCode[cIndex]
                             cIndex += 1
-                    elif inputCode[cIndex] == '=':
-                        tokenType = 'operator'
+                    elif inputCode[cIndex] == '=': # changed to work only with ==
                         currentToken += inputCode[cIndex]
                         cIndex += 1
                         if inputCode[cIndex] == '=':
+                            tokenType = 'operator'
                             currentToken += inputCode[cIndex]
                             cIndex += 1
                     elif inputCode[cIndex] == '!':
@@ -164,17 +165,32 @@ class LexicAnalizer:
                                         cIndex += 1
                             currentToken = currentToken[0:len(currentToken)-1]
                             tokenType = 'multiline_commentary'
+                    
+                    elif inputCode[cIndex] == ':':
+                        currentToken += inputCode[cIndex]
+                        cIndex += 1
+                        if inputCode[cIndex] == '=':
+                            tokenType = 'operator'
+                            currentToken += inputCode[cIndex]
+                            cIndex += 1
+
                     else:                                       # if not one of above, no need in checking for further chars
                         currentToken += inputCode[cIndex]
                     tokenEnd = cIndex
                     cIndex -= 1
 
-                elif inputCode[cIndex] not in charsetExtended and inputCode[cIndex] not in numbers and inputCode[cIndex] not in operators and inputCode[cIndex] not in spacesAndStuff:
+                #elif inputCode[cIndex] not in charsetExtended and inputCode[cIndex] not in numbers and inputCode[cIndex] not in operators and inputCode[cIndex] not in spacesAndStuff:
                     # Considered special character if not in the above alphabets
+                    # Deprecated
+                elif inputCode[cIndex] in specialCharacters: # 
                     tokenStart = cIndex
                     tokenEnd = cIndex+1
                     currentToken += inputCode[cIndex]
                     tokenType = 'special_character'
+                
+                elif inputCode[cIndex] not in spacesAndStuff: 
+                    # if it doesnt enter any if above and its not a space or line break it's an error????:0
+                    print('error '+inputCode[cIndex])
 
                 if len(currentToken) > 0 and tokenType != '': # Checking token and tokentype not empty
                     if currentToken in restricted: # If the token content is a restricted word we manage it
