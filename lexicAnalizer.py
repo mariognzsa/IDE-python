@@ -107,6 +107,8 @@ class LexicAnalizer:
                             tokenType = 'operator'
                             currentToken += inputCode[cIndex]
                             cIndex += 1
+                        else:
+                            currentToken = ''
                     elif inputCode[cIndex] == '!':
                         tokenType = 'operator'
                         currentToken += inputCode[cIndex]
