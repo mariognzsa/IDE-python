@@ -38,6 +38,7 @@ class LexicAnalizer:
         specialCharacters = '}{)(][#$%&'
         self.tokens = []  # Array of found tokens
         currentToken = ''
+        tokenType = ''
         tokenStart = 0
         tokenEnd = 0
         cIndex = 0   # index for current character
@@ -107,8 +108,8 @@ class LexicAnalizer:
                             tokenType = 'operator'
                             currentToken += inputCode[cIndex]
                             cIndex += 1
-                        else:
-                            currentToken = ''
+                        #else:
+                        #    currentToken = ''
                     elif inputCode[cIndex] == '!':
                         tokenType = 'operator'
                         currentToken += inputCode[cIndex]
@@ -193,6 +194,7 @@ class LexicAnalizer:
                 elif inputCode[cIndex] not in spacesAndStuff: 
                     # if it doesnt enter any if above and its not a space or line break it's an error????:0
                     print('error '+inputCode[cIndex])
+                    #This part manages another kind of errors such as an Uppercase letter at the beginning of a word
 
                 if len(currentToken) > 0 and tokenType != '': # Checking token and tokentype not empty
                     if currentToken in restricted: # If the token content is a restricted word we manage it
@@ -202,5 +204,11 @@ class LexicAnalizer:
                     tokenType = ''
                     currentToken = ''
                     tkIndex += 1
+
+                if tokenType == '':
+                    tokenType = 'error'
+                    currentToken += inputCode[cIndex]
+                    currentToken = currentToken[0:len(currentToken)-1]
+
             cIndex += 1
 
