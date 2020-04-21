@@ -627,6 +627,8 @@ class Toplevel1:
             return "blue"
         elif (type == "operator" or type == "special_character"):
             return "green"
+        elif (type == "error"):
+            return "red"
 
     def pos_to_rowcol(self, pos):
         rcount=1
@@ -655,10 +657,14 @@ class Toplevel1:
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
         self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
         self.Scrolledtext3.delete(1.0, tk.END)
+        self.Scrolledtext5.delete(1.0, tk.END)
         for tag in self.Scrolledtext1.tag_names():
             self.Scrolledtext1.tag_delete(tag)
         for token in self.analizer.tokens:
-            self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+            if (str(token.tokenType) != "error"):
+                self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+            else:
+                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
             self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
             self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
 
