@@ -616,11 +616,11 @@ class Toplevel1:
         root.bind('<1>', self.update_rowCount)
         root.bind('<Key>', self.update_rowCount)
         #root.bind('<Motion>', self.update_rowCount)
-        #root.bind('<MouseWheel>', self.update_rowCount) 
+        root.bind('<MouseWheel>', self.update_rowCount) 
 
-        root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
-        root.bind('<KeyRelease>', self.statusbar.update_statusbar)
-        root.bind('<Motion>', self.statusbar.update_statusbar)
+        root.bind('<ButtonRelease-1>', self.update_code_screen)
+        root.bind('<KeyRelease>', self.update_code_screen)
+        root.bind('<Motion>', self.update_code_screen)
         #root.bind('<MouseWheel>', self.statusbar.update_statusbar)
 
     def wordColor(self, type):
@@ -636,8 +636,6 @@ class Toplevel1:
             return "green"
         elif (type == "error"):
             return "red"
-
-            
 
     def pos_to_rowcol(self, pos):
         rcount=1
@@ -664,6 +662,9 @@ class Toplevel1:
         self.Text1.insert(tk.END, cadNums.strip('\n'))
         self.Text1.config(state=tk.DISABLED)
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
+        
+    def update_code_screen(self, *args):
+        self.statusbar.update_statusbar()
         self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
         for tag in self.Scrolledtext1.tag_names():
             self.Scrolledtext1.tag_delete(tag)
