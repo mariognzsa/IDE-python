@@ -628,7 +628,7 @@ class Toplevel1:
             return "deeppink"
         elif (type == "oneline_commentary" or type == "multiline_commentary"):
             return "gray"
-        elif (type == "restricted_word" or type == "end_sentence"):
+        elif (type == "restricted_word" or type == "end_sentence" or type == 'separator'):
             return "blue"
         elif (type == "operator" or type == "special_character"):
             return "green"

@@ -35,7 +35,7 @@ class LexicAnalizer:
         numbers = '0123456789'
         operators = '+-<>=|!/*:;'
         spacesAndStuff = ' \n'  # Pls rename later
-        specialCharacters = '}{)(][#$%&'
+        specialCharacters = '}{)(][%,'
         self.tokens = []  # Array of found tokens
         currentToken = ''
         tokenType = ''
@@ -64,6 +64,7 @@ class LexicAnalizer:
                     cIndex += 1
                     number = True
                     floatingNumber = False
+                    tokenError = False
                     decimalPoints = 0
                     while number and decimalPoints <= 1:  # Loop just for numbers and one decimalpoint max
                         if inputCode[cIndex] in numbers:
@@ -72,16 +73,21 @@ class LexicAnalizer:
                         elif inputCode[cIndex] == '.':
                             if decimalPoints < 1 and inputCode[cIndex+1] in numbers: # Turns on a flag to differenciate int and float
                                 currentToken += inputCode[cIndex]
-                                floatingNumber = True                          
+                                floatingNumber = True
+                            else:
+                                tokenError = True                   
                             cIndex += 1
                             decimalPoints += 1
                             
                         else:
                             number = False
-                    if floatingNumber:
-                        tokenType = 'float'
+                    if tokenError:
+                        tokenType = 'error'
                     else:
-                        tokenType = 'integer'
+                        if floatingNumber:
+                            tokenType = 'float'
+                        else:
+                            tokenType = 'integer'
                     tokenEnd = cIndex
                     cIndex -= 1
 
@@ -108,8 +114,9 @@ class LexicAnalizer:
                             tokenType = 'operator'
                             currentToken += inputCode[cIndex]
                             cIndex += 1
-                        #else:
-                        #    currentToken = ''
+                        else:
+                            tokenType = 'error'
+
                     elif inputCode[cIndex] == '!':
                         tokenType = 'operator'
                         currentToken += inputCode[cIndex]
@@ -183,6 +190,11 @@ class LexicAnalizer:
                         currentToken += inputCode[cIndex]
                         cIndex += 1
 
+                    elif inputCode[cIndex] == ',':
+                        tokenType = 'separator'
+                        currentToken += inputCode[cIndex]
+                        cIndex += 1
+
                     else:                                       # if not one of above, no need in checking for further chars
                         currentToken += inputCode[cIndex]
                     tokenEnd = cIndex
@@ -199,7 +211,13 @@ class LexicAnalizer:
                 
                 elif inputCode[cIndex] not in spacesAndStuff: 
                     # if it doesnt enter any if above and its not a space or line break it's an error????:0
-                    print('error '+inputCode[cIndex])
+                    print('hell')
+                    tokenStart = cIndex
+                    tokenEnd = cIndex+1
+                    tokenType = 'error'
+                    currentToken += inputCode[cIndex]
+                    cIndex += 1
+                    tokenError = False
                     #This part manages another kind of errors such as an Uppercase letter at the beginning of a word
 
                 if len(currentToken) > 0 and tokenType != '': # Checking token and tokentype not empty
@@ -211,10 +229,11 @@ class LexicAnalizer:
                     currentToken = ''
                     tkIndex += 1
 
-                if tokenType == '':
-                    tokenType = 'error'
-                    currentToken += inputCode[cIndex]
-                    currentToken = currentToken[0:len(currentToken)-1]
+                #if tokenType == '' or tokenError:
+                #    tokenType = 'error'
+                #    currentToken += inputCode[cIndex]
+                #    currentToken = currentToken[0:len(currentToken)-1]
+                #    tokenError = False
 
             cIndex += 1
 
