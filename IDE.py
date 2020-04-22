@@ -584,6 +584,8 @@ class Toplevel1:
             print(e)
 
     def compile(self, *args):
+        self.Scrolledtext3.delete(1.0, tk.END)
+        self.Scrolledtext5.delete(1.0, tk.END)
         for token in self.analizer.tokens:
             if (str(token.tokenType) != "error"):
                 self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
@@ -628,7 +630,7 @@ class Toplevel1:
             return "deeppink"
         elif (type == "oneline_commentary" or type == "multiline_commentary"):
             return "gray"
-        elif (type == "restricted_word" or type == "end_sentence" or type == 'separator'):
+        elif (type == "restricted_word" or type == "end_sentence"):
             return "blue"
         elif (type == "operator" or type == "special_character"):
             return "green"
@@ -663,8 +665,6 @@ class Toplevel1:
         self.Text1.config(state=tk.DISABLED)
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
         self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
-        self.Scrolledtext3.delete(1.0, tk.END)
-        self.Scrolledtext5.delete(1.0, tk.END)
         for tag in self.Scrolledtext1.tag_names():
             self.Scrolledtext1.tag_delete(tag)
         for token in self.analizer.tokens:
