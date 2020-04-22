@@ -216,7 +216,7 @@ class LexicAnalizer:
                     tokenEnd = cIndex+1
                     tokenType = 'error'
                     currentToken += inputCode[cIndex]
-                    cIndex += 1
+                    #cIndex += 1
                     tokenError = False
                     #This part manages another kind of errors such as an Uppercase letter at the beginning of a word
 
