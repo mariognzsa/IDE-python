@@ -666,7 +666,7 @@ class Toplevel1:
             if (str(token.tokenType) != "error"):
                 self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
             else:
-                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
             self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
             self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
 
