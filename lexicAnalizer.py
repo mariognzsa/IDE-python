@@ -152,8 +152,7 @@ class LexicAnalizer:
                             cIndex += 1
                             commentary = False
                             if inputCode[cIndex] == '\n':
-                                currentToken = ' \n'
-                                commentary = True
+                                currentToken = ' '
                             while commentary == False and cIndex < len(inputCode): # Loop multiline comments
                                 if inputCode[cIndex] != '*':
                                     currentToken += inputCode[cIndex]
@@ -162,6 +161,8 @@ class LexicAnalizer:
                                     if inputCode[cIndex+1] == '/':
                                         cIndex += 2
                                         currentToken += inputCode[cIndex]
+                                        if currentToken == '\n':
+                                            currentToken = ' \n'
                                         commentary = True
                                     else:
                                         currentToken += inputCode[cIndex]
