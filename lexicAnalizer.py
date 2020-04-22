@@ -184,6 +184,8 @@ class LexicAnalizer:
                             tokenType = 'operator'
                             currentToken += inputCode[cIndex]
                             cIndex += 1
+                        else:
+                            tokenType = 'error'
 
                     elif inputCode[cIndex] == ';':
                         tokenType = 'end_sentence'
@@ -211,7 +213,7 @@ class LexicAnalizer:
                 
                 elif inputCode[cIndex] not in spacesAndStuff: 
                     # if it doesnt enter any if above and its not a space or line break it's an error????:0
-                    print('hell')
+                    #print('hell')
                     tokenStart = cIndex
                     tokenEnd = cIndex+1
                     tokenType = 'error'
