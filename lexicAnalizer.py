@@ -33,7 +33,7 @@ class LexicAnalizer:
         charset = 'abcdefghijklmnopqrstuvwxyz' # array permitted for identifier's first character
         charsetExtended = 'abcdefghijklmnopqrstuvwxyz_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         numbers = '0123456789'
-        operators = '+-<>=|!/*:'
+        operators = '+-<>=|!/*:;'
         spacesAndStuff = ' \n'  # Pls rename later
         specialCharacters = '}{)(][#$%&'
         self.tokens = []  # Array of found tokens
@@ -176,6 +176,11 @@ class LexicAnalizer:
                             tokenType = 'operator'
                             currentToken += inputCode[cIndex]
                             cIndex += 1
+
+                    elif inputCode[cIndex] == ';':
+                        tokenType = 'end_sentence'
+                        currentToken += inputCode[cIndex]
+                        cIndex += 1
 
                     else:                                       # if not one of above, no need in checking for further chars
                         currentToken += inputCode[cIndex]
