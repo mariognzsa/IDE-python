@@ -623,12 +623,14 @@ class Toplevel1:
             return "deeppink"
         elif (type == "oneline_commentary" or type == "multiline_commentary"):
             return "gray"
-        elif (type == "restricted_word"):
+        elif (type == "restricted_word" or type == "end_sentence"):
             return "blue"
         elif (type == "operator" or type == "special_character"):
             return "green"
         elif (type == "error"):
             return "red"
+
+            
 
     def pos_to_rowcol(self, pos):
         rcount=1
