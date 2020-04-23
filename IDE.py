@@ -512,6 +512,7 @@ class Toplevel1:
         self.set_window_title()
         self.update_rowCount()
         self.statusbar = Statusbar(self)
+        self.update_code_screen()
         self.bind_shortcuts()
         self.Scrolledtext1.focus()
 
@@ -545,7 +546,7 @@ class Toplevel1:
             self.set_window_title(self.filename)
             self.Scrolledtext1.mark_set('insert', '1.0')
         self.update_rowCount()
-        self.statusbar.update_statusbar()
+        self.update_code_screen()
 
     def save(self, *args):
         if self.filename:
