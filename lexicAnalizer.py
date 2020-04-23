@@ -75,7 +75,8 @@ class LexicAnalizer:
                                 currentToken += inputCode[cIndex]
                                 floatingNumber = True
                             else:
-                                tokenError = True                   
+                                tokenError = True
+                                currentToken += inputCode[cIndex]                  
                             cIndex += 1
                             decimalPoints += 1
                             
