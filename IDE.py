@@ -588,9 +588,9 @@ class Toplevel1:
         self.Scrolledtext3.delete(1.0, tk.END)
         self.Scrolledtext5.delete(1.0, tk.END)
         for token in self.analizer.tokens:
-            if (str(token.tokenType) != "error"):
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
                 self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
-            else:
+            elif (str(token.tokenType) == "error"):
                 self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
         #os.system('echo "Compilando..."')
         
