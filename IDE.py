@@ -28,7 +28,8 @@ import os
 import PIL
 from PIL import Image, ImageTk
 
-from lexicAnalizer import LexicAnalizer, Token
+from lexicAnalyzer import LexicAnalyzer, Token
+import sintacticAnalyzer
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -39,6 +40,7 @@ def vp_start_gui():
     root.mainloop()
 
 w = None
+
 def create_Toplevel1(rt, *args, **kwargs):
     '''Starting point when module is imported by another module.
        Correct form of call: 'create_Toplevel1(root, *args, **kwargs)' .'''
@@ -57,7 +59,7 @@ def destroy_Toplevel1():
 
 class Toplevel1:
     def __init__(self, top=None):
-        self.analizer = LexicAnalizer()   # Initializing the lexic analizer
+        self.analyzer = LexicAnalyzer()   # Initializing the lexic analyzer
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -193,27 +195,27 @@ class Toplevel1:
                 command=self.debug)
 
         # Image files
-        self.image = Image.open("img/file-multiple.png")
+        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/file-multiple.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_new_file = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/content-save.png")
+        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/content-save.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/content-save-edit.png")
+        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/content-save-edit.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save_as = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/folder-open.png")
+        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/folder-open.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_open = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/play-pause.png")
+        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/play-pause.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_compile = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/bug-check-outline.png")
+        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/bug-check-outline.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_debug = ImageTk.PhotoImage(self.image)
 
@@ -323,19 +325,19 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(wrap="none")
 
-        self.Scrolledtext4 = ScrolledText(self.compilerTabs_t2)
+        self.Scrolledtext4 = ttk.Treeview(self.compilerTabs_t2)
         self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021
                 , relwidth=1.036)
-        self.Scrolledtext4.configure(background="white")
-        self.Scrolledtext4.configure(font="TkTextFont")
-        self.Scrolledtext4.configure(foreground="black")
-        self.Scrolledtext4.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext4.configure(highlightcolor="black")
-        self.Scrolledtext4.configure(insertbackground="black")
-        self.Scrolledtext4.configure(insertborderwidth="3")
-        self.Scrolledtext4.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext4.configure(selectforeground="black")
-        self.Scrolledtext4.configure(wrap="none")
+        #self.Scrolledtext4.configure(background="white")
+        #self.Scrolledtext4.configure(font="TkTextFont")
+        #self.Scrolledtext4.configure(foreground="black")
+        #self.Scrolledtext4.configure(highlightbackground="#d9d9d9")
+        #self.Scrolledtext4.configure(highlightcolor="black")
+        #self.Scrolledtext4.configure(insertbackground="black")
+        #self.Scrolledtext4.configure(insertborderwidth="3")
+        #self.Scrolledtext4.configure(selectbackground="#c4c4c4")
+        #self.Scrolledtext4.configure(selectforeground="black")
+        #self.Scrolledtext4.configure(wrap="none")
 
         self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
         self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
@@ -585,15 +587,52 @@ class Toplevel1:
             print(e)
 
     def compile(self, *args):
+        lexicErrorFlag = 0
+        #Clearing all text boxes
         self.Scrolledtext3.delete(1.0, tk.END)
+        for i in self.Scrolledtext4.get_children():
+            self.Scrolledtext4.delete(i)
         self.Scrolledtext5.delete(1.0, tk.END)
-        for token in self.analizer.tokens:
+        self.Scrolledtext6.delete(1.0, tk.END)
+        #Reseting sintactic analyzer globals
+        sintacticAnalyzer.ig = 0
+        sintacticAnalyzer.tokens = []
+        sintacticAnalyzer.errors = []
+        sintacticAnalyzer.tree = []
+        #Printing tokens and lexic errors
+        for token in self.analyzer.tokens:
             if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
                 self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
             elif (str(token.tokenType) == "error"):
+                lexicErrorFlag = 1
                 self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
-        #os.system('echo "Compilando..."')
-        
+        #Filtering lexic tokens to pass them correctly to the sintactic analyzer
+        for token in self.analyzer.tokens:
+            token.line = self.pos_to_rowcol(token.start).split('.')[0]
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                sintacticAnalyzer.tokens.append(token)
+        #Doing sintactic analysis, getting the treeview and printing sintactic errors
+        if (sintacticAnalyzer.tokens != [] and lexicErrorFlag == 0):
+            self.sint_analyzer = sintacticAnalyzer.programa()
+            #Errors
+            for error in sintacticAnalyzer.errors:
+                self.Scrolledtext6.insert(tk.END, error + "\n")
+            #Treeview
+            self.verNodo(self.sint_analyzer,"")
+
+    def verNodo(self, nodo, padre):
+        if(nodo != None):
+            item = self.Scrolledtext4.insert(padre, tk.END, text=str(nodo.nombre))
+            self.Scrolledtext4.item(item, open=True)#Showing the Treeview expanded
+            if str(nodo.dato) != "None":
+                self.Scrolledtext4.insert(item, tk.END, text=str(nodo.dato))
+            for s in nodo.sibling:
+                self.verNodo(s,padre)
+            self.verNodo(nodo.hijo[0],item)
+            self.verNodo(nodo.hijo[1],item)
+            self.verNodo(nodo.hijo[2],item)
+        return
+
     def debug(self, *args):
         os.system('echo "Depurando..."')
         
@@ -666,10 +705,10 @@ class Toplevel1:
         
     def update_code_screen(self, *args):
         self.statusbar.update_statusbar()
-        self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
+        self.analyzer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
         for tag in self.Scrolledtext1.tag_names():
             self.Scrolledtext1.tag_delete(tag)
-        for token in self.analizer.tokens:
+        for token in self.analyzer.tokens:
             self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
             self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
 
