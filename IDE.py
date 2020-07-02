@@ -596,6 +596,7 @@ class Toplevel1:
         self.Scrolledtext6.delete(1.0, tk.END)
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
+        sintacticAnalyzer.EOF = False
         sintacticAnalyzer.tokens = []
         sintacticAnalyzer.errors = []
         sintacticAnalyzer.tree = []
