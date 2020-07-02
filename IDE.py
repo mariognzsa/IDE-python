@@ -325,19 +325,13 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(wrap="none")
 
-        self.Scrolledtext4 = ttk.Treeview(self.compilerTabs_t2)
-        self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021
-                , relwidth=1.036)
-        #self.Scrolledtext4.configure(background="white")
-        #self.Scrolledtext4.configure(font="TkTextFont")
-        #self.Scrolledtext4.configure(foreground="black")
-        #self.Scrolledtext4.configure(highlightbackground="#d9d9d9")
-        #self.Scrolledtext4.configure(highlightcolor="black")
-        #self.Scrolledtext4.configure(insertbackground="black")
-        #self.Scrolledtext4.configure(insertborderwidth="3")
-        #self.Scrolledtext4.configure(selectbackground="#c4c4c4")
-        #self.Scrolledtext4.configure(selectforeground="black")
-        #self.Scrolledtext4.configure(wrap="none")
+        self.Scrolledtext4 = ttk.Treeview(self.compilerTabs_t2, show='tree')
+        scrollbar_horizontal = ttk.Scrollbar(self.compilerTabs_t2, orient='horizontal', command = self.Scrolledtext4.xview)
+        scrollbar_vertical = ttk.Scrollbar(self.compilerTabs_t2, orient='vertical', command = self.Scrolledtext4.yview)
+        scrollbar_horizontal.pack(side='bottom', fill=tk.X)
+        scrollbar_vertical.pack(side='right', fill=tk.Y)
+        self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
+        self.Scrolledtext4.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
 
         self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
         self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
