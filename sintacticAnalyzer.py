@@ -226,7 +226,7 @@ def asignacion():
         ig += 1
     else:
         error(1,"Error. Main inconcluso, falta cerrar llave.", tokens[ig-1].line)
-    if tokens[ig].token == ":=":
+    if tokens[ig].token == ":=" or (tokens[ig].token != "++" and tokens[ig].token != "--"):
         match(':=')
         nuevo.nombre = "Asignacion"
         nuevo.hijo[0] = temp
