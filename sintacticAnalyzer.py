@@ -1,6 +1,7 @@
 tokens = []
 errors = []
 tree = []
+EOF = False
 class Token(object):
     def __init__(self):
         self.token = None
@@ -18,9 +19,12 @@ class Nodo(object):
 def match(tokensActual):
     global ig
     global tokens
+    global EOF
     if tokens[ig].token == tokensActual:
         if ig < len(tokens)-1:
             ig += 1
+        else:
+            EOF = True
     else:
         #print(tokens[ig].token)
         error(0, tokensActual, tokens[ig].line)
@@ -28,13 +32,17 @@ def match(tokensActual):
 def programa():
     global ig
     global tokens
+    global EOF
     temp = Nodo()
     temp.nombre = "Main"
     match('main')
     match('{')
     temp.hijo[0] = lista_declaracion()
     temp.hijo[1] = lista_sentencias()
-    match('}')
+    if not EOF:
+        match('}')
+    else:
+        error(1,"Error. Main inconcluso, falta cerrar llave.", tokens[ig].line)
     return temp
 
 def lista_declaracion():
@@ -99,13 +107,16 @@ def lista_sentencias():
     while temp.hijo[0] != None:
         temp.hijo[0].sibling.append(sentencia())
         if temp.hijo[0].sibling[len(temp.hijo[0].sibling)-1] == None:
-            break
+            if (tokens[ig].token == "}" and ig < len(tokens)-1) or tokens[ig].token == "else" or tokens[ig].token == "end" or tokens[ig].token == "until" or ig == len(tokens)-1:
+                break
+            else:
+                ig += 1
     return temp
 
 def sentencia():
     global ig
     global tokens
-    if tokens[ig].token == 'if' or tokens[ig].token == 'while' or tokens[ig].token == 'do' or tokens[ig].token == 'cin' or tokens[ig].token == 'cout' or tokens[ig].token == '{' or tokens[ig].tokenType == 'identifier':
+    if  ig < len(tokens)-1 and (tokens[ig].token == 'if' or tokens[ig].token == 'while' or tokens[ig].token == 'do' or tokens[ig].token == 'cin' or tokens[ig].token == 'cout' or tokens[ig].token == '{' or tokens[ig].tokenType == 'identifier'):
         temp = Nodo()
         temp.nombre = "Sentencia"
         if tokens[ig].token == 'if':
@@ -157,7 +168,7 @@ def repeticion():
     global ig
     global tokens
     temp = Nodo()
-    temp.nombre = "Repeat"
+    temp.nombre = "Do"
     match('do')
     temp.hijo[0] = bloque()
     match('until')
@@ -227,13 +238,13 @@ def asignacion():
             match('++')
             nuevo.nombre = "++"
             nuevo.hijo[0] = temp
-            nuevo.dato = str(temp.dato) + "+1"
+            #nuevo.dato = str(temp.dato) + "+1"
             temp = nuevo
         else:
             match('--')
             nuevo.nombre = "--"
             nuevo.hijo[0] = temp
-            nuevo.dato = str(temp.dato) + "-1"
+            #nuevo.dato = str(temp.dato) + "-1"
             temp = nuevo
         match(';')
     else:
@@ -251,60 +262,72 @@ def expresion():
             nuevo.nombre = "<="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
+            '''
             if (temp.dato <= nuevo.hijo[1].dato): 
                 nuevo.dato = True
             else: 
                 nuevo.dato = False
+            '''
             temp = nuevo
         elif tokens[ig].token == '<':
             match('<')  
             nuevo.nombre = "<"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
+            '''
             if (temp.dato < nuevo.hijo[1].dato): 
                 nuevo.dato = True
             else: 
                 nuevo.dato = False
+            '''
             temp = nuevo
         elif tokens[ig].token == '>':
             match('>')  
             nuevo.nombre = ">"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
+            '''
             if (temp.dato > nuevo.hijo[1].dato): 
                 nuevo.dato = True
             else: 
                 nuevo.dato = False
+            '''
             temp = nuevo
         elif tokens[ig].token == '>=':
             match('>=')  
             nuevo.nombre = ">="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
+            '''
             if (temp.dato >= nuevo.hijo[1].dato): 
                 nuevo.dato = True
             else: 
                 nuevo.dato = False
+            '''
             temp = nuevo
         elif tokens[ig].token == '==':
             match('==')  
             nuevo.nombre = "=="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
+            '''
             if (temp.dato == nuevo.hijo[1].dato): 
                 nuevo.dato = True
             else: 
                 nuevo.dato = False
+            '''
             temp = nuevo
         elif tokens[ig].token == '!=':
             match('!=')  
             nuevo.nombre = "!="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple()
+            '''
             if (temp.dato != nuevo.hijo[1].dato): 
                 nuevo.dato = True
             else: 
                 nuevo.dato = False
+            '''
             temp = nuevo
     return temp
 
@@ -318,27 +341,31 @@ def expresion_simple():
             match('+')  
             nuevo.nombre = "+"
             nuevo.hijo[0] = temp
-            nuevo.dato = temp.dato
+            #nuevo.dato = temp.dato
             nuevo.hijo[1] = termino()
+            '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
                 nuevo.dato += float(nuevo.hijo[1].dato)
             else:
                 nuevo.dato = str(nuevo.dato)
                 nuevo.dato += "+" + str(nuevo.hijo[1].dato)
+            '''
             temp = nuevo
         elif tokens[ig].token == '-':
             match('-')  
             nuevo.nombre = "-"
             nuevo.hijo[0] = temp
-            nuevo.dato = temp.dato
+            #nuevo.dato = temp.dato
             nuevo.hijo[1] = termino()
+            '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
                 nuevo.dato -= float(nuevo.hijo[1].dato)
             else:
                 nuevo.dato = str(nuevo.dato)
                 nuevo.dato += "-" + str(nuevo.hijo[1].dato)
+            '''
             temp = nuevo
     return temp
 
@@ -352,40 +379,46 @@ def termino():
             match('*')  
             nuevo.nombre = "*"
             nuevo.hijo[0] = temp
-            nuevo.dato = temp.dato
+            #nuevo.dato = temp.dato
             nuevo.hijo[1] = termino()
+            '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
                 nuevo.dato *= float(nuevo.hijo[1].dato)
             else:
                 nuevo.dato = str(nuevo.dato)
                 nuevo.dato += "*" + str(nuevo.hijo[1].dato)
+            '''
             temp = nuevo
         elif tokens[ig].token == '/':
             match('/')  
             nuevo.nombre = "/"
             nuevo.hijo[0] = temp
-            nuevo.dato = temp.dato
+            #nuevo.dato = temp.dato
             nuevo.hijo[1] = termino()
+            '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
                 nuevo.dato /= float(nuevo.hijo[1].dato)
             else:
                 nuevo.dato = str(nuevo.dato)
                 nuevo.dato += "/" + str(nuevo.hijo[1].dato)
+            '''
             temp = nuevo
         elif tokens[ig].token == '%':
             match('%')  
             nuevo.nombre = "%"
             nuevo.hijo[0] = temp
-            nuevo.dato = temp.dato
+            #nuevo.dato = temp.dato
             nuevo.hijo[1] = termino()
+            '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
                 nuevo.dato %= float(nuevo.hijo[1].dato)
             else:
                 nuevo.dato = str(nuevo.dato)
                 nuevo.dato += "%" + str(nuevo.hijo[1].dato)
+            '''
             temp = nuevo
     return temp
 
@@ -398,14 +431,16 @@ def factor():
         match('^')  
         nuevo.nombre = "^"
         nuevo.hijo[0] = temp
-        nuevo.dato = temp.dato
+        #nuevo.dato = temp.dato
         nuevo.hijo[1] = termino()
+        '''
         if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
             nuevo.dato = float(nuevo.dato)
             nuevo.dato **= float(nuevo.hijo[1].dato)
         else:
             nuevo.dato = str(nuevo.dato)
             nuevo.dato += "^" + str(nuevo.hijo[1].dato)
+        '''
         temp = nuevo
     return temp
 
@@ -413,7 +448,7 @@ def fin():
     global ig
     global tokens
     temp = Nodo()
-    if tokens[ig].tokenType == 'special_caracter':
+    if tokens[ig].tokenType == 'special_character':
         match('(')
         temp = expresion()
         match(')')
@@ -439,7 +474,7 @@ def fin():
     return temp
 
 def error(op, token, line):
-    global errors
+    global errors, ig
     if op == 0:
         errors.append("Error. Se esperaba '" + token + "'. En la linea " + line)
         #print("Error. Se esperaba '" + token + "'. En la linea " + line)
