@@ -448,7 +448,7 @@ def fin():
     global ig
     global tokens
     temp = Nodo()
-    if tokens[ig].tokenType == 'special_character':
+    if tokens[ig].token == '(':
         match('(')
         temp = expresion()
         match(')')
