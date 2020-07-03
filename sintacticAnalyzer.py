@@ -236,13 +236,13 @@ def asignacion():
     elif tokens[ig].token == "++" or tokens[ig].token == "--":
         if tokens[ig].token == "++":
             match('++')
-            nuevo.nombre = "++"
+            nuevo.nombre = "Asignacion"
             nuevo.hijo[0] = temp
             nuevo.dato = str(temp.dato) + "+1"
             temp = nuevo
         else:
             match('--')
-            nuevo.nombre = "--"
+            nuevo.nombre = "Asignacion"
             nuevo.hijo[0] = temp
             nuevo.dato = str(temp.dato) + "-1"
             temp = nuevo
