@@ -380,7 +380,7 @@ def termino():
             nuevo.nombre = "*"
             nuevo.hijo[0] = temp
             #nuevo.dato = temp.dato
-            nuevo.hijo[1] = termino()
+            nuevo.hijo[1] = factor()
             '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
@@ -395,7 +395,7 @@ def termino():
             nuevo.nombre = "/"
             nuevo.hijo[0] = temp
             #nuevo.dato = temp.dato
-            nuevo.hijo[1] = termino()
+            nuevo.hijo[1] = factor()
             '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
@@ -410,7 +410,7 @@ def termino():
             nuevo.nombre = "%"
             nuevo.hijo[0] = temp
             #nuevo.dato = temp.dato
-            nuevo.hijo[1] = termino()
+            nuevo.hijo[1] = factor()
             '''
             if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
                 nuevo.dato = float(nuevo.dato)
@@ -432,7 +432,7 @@ def factor():
         nuevo.nombre = "^"
         nuevo.hijo[0] = temp
         #nuevo.dato = temp.dato
-        nuevo.hijo[1] = termino()
+        nuevo.hijo[1] = fin()
         '''
         if (type(nuevo.dato) == int or type(nuevo.dato) == float) and (type(nuevo.hijo[1].dato) == int or type(nuevo.hijo[1].dato) == float):
             nuevo.dato = float(nuevo.dato)
