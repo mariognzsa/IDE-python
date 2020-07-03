@@ -273,8 +273,8 @@ class Toplevel1:
         self.style.map('TNotebook.Tab', background=
             [('selected', _compcolor), ('active',_ana2color)])
         self.compilerTabs = ttk.Notebook(top)
-        self.compilerTabs.place(relx=0.78, rely=0.016, relheight=0.644
-                , relwidth=0.211)
+        self.compilerTabs.place(relx=0.58, rely=0.016, relheight=0.644
+                , relwidth=0.411)
         self.compilerTabs.configure(takefocus="")
         self.compilerTabs_t1 = tk.Frame(self.compilerTabs)
         self.compilerTabs.add(self.compilerTabs_t1, padding=3)
@@ -465,7 +465,7 @@ class Toplevel1:
         self.Scrolledtext10.configure(wrap="none")
 
         self.Scrolledtext1 = ScrolledText(top)
-        self.Scrolledtext1.place(relx=0.049, rely=0.016, relheight=0.646, relwidth=0.726)
+        self.Scrolledtext1.place(relx=0.049, rely=0.016, relheight=0.646, relwidth=0.526)
         self.Scrolledtext1.configure(background="white")
         self.Scrolledtext1.configure(font="TkTextFont")
         self.Scrolledtext1.configure(foreground="black")
