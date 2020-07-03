@@ -238,13 +238,13 @@ def asignacion():
             match('++')
             nuevo.nombre = "++"
             nuevo.hijo[0] = temp
-            #nuevo.dato = str(temp.dato) + "+1"
+            nuevo.dato = str(temp.dato) + "+1"
             temp = nuevo
         else:
             match('--')
             nuevo.nombre = "--"
             nuevo.hijo[0] = temp
-            #nuevo.dato = str(temp.dato) + "-1"
+            nuevo.dato = str(temp.dato) + "-1"
             temp = nuevo
         match(';')
     else:
