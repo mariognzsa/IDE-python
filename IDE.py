@@ -587,8 +587,10 @@ class Toplevel1:
         self.Scrolledtext3.delete(1.0, tk.END)
         for i in self.Scrolledtext4.get_children():
             self.Scrolledtext4.delete(i)
-        self.Scrolledtext5.delete(1.0, tk.END)
-        self.Scrolledtext6.delete(1.0, tk.END)
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
+        self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
+        self.Scrolledtext7.insert(tk.END, "Hola")
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
         sintacticAnalyzer.EOF = False
