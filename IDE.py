@@ -30,6 +30,7 @@ from PIL import Image, ImageTk
 
 from lexicAnalyzer import LexicAnalyzer, Token
 import sintacticAnalyzer
+import semanticAnalyzer
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -594,6 +595,11 @@ class Toplevel1:
         sintacticAnalyzer.tokens = []
         sintacticAnalyzer.errors = []
         sintacticAnalyzer.tree = []
+        semanticAnalyzer.ig = 0
+        semanticAnalyzer.EOF = False
+        semanticAnalyzer.tokens = []
+        semanticAnalyzer.errors = []
+        semanticAnalyzer.tree = []
         #Printing tokens and lexic errors
         for token in self.analyzer.tokens:
             if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
