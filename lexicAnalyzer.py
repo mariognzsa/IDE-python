@@ -1,14 +1,15 @@
-# LexicAnalizer v1.0
+# LexicAnalyzer v1.0
 
 class Token:
-    def __init__(self, id, tokenType, token, start, end):
+    def __init__(self, id, tokenType, token, start, end, line):
         self.id = id
         self.tokenType = tokenType
         self.token = token
         self.start = start
         self.end = end
+        self.line = line
 
-class LexicAnalizer:
+class LexicAnalyzer:
     def __init__(self):
         self.tokens = []
 
@@ -22,7 +23,8 @@ class LexicAnalizer:
             'end',
             'do', 
             'while', 
-            'cin', 
+            'cin',
+            'until', 
             'cout', 
             'real', 
             'int', 
@@ -34,7 +36,7 @@ class LexicAnalizer:
         charsetExtended = 'abcdefghijklmnopqrstuvwxyz_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         numbers = '0123456789'
         operators = '+-<>=|!/*:;'
-        spacesAndStuff = ' \n'  # Pls rename later
+        spacesAndStuff = ' \n\t'  # Pls rename later
         specialCharacters = '}{)(][%,'
         self.tokens = []  # Array of found tokens
         currentToken = ''
@@ -226,7 +228,7 @@ class LexicAnalizer:
                 if len(currentToken) > 0 and tokenType != '': # Checking token and tokentype not empty
                     if currentToken in restricted: # If the token content is a restricted word we manage it
                         tokenType = 'restricted_word'
-                    tokenInfo = Token(tkIndex, tokenType, currentToken, tokenStart, tokenEnd)
+                    tokenInfo = Token(tkIndex, tokenType, currentToken, tokenStart, tokenEnd, 0)
                     self.tokens.append(tokenInfo)
                     tokenType = ''
                     currentToken = ''

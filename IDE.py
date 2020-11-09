@@ -28,7 +28,9 @@ import os
 import PIL
 from PIL import Image, ImageTk
 
-from lexicAnalizer import LexicAnalizer, Token
+from lexicAnalyzer import LexicAnalyzer, Token
+import sintacticAnalyzer
+import semanticAnalyzer
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -39,6 +41,7 @@ def vp_start_gui():
     root.mainloop()
 
 w = None
+
 def create_Toplevel1(rt, *args, **kwargs):
     '''Starting point when module is imported by another module.
        Correct form of call: 'create_Toplevel1(root, *args, **kwargs)' .'''
@@ -56,8 +59,11 @@ def destroy_Toplevel1():
     w = None
 
 class Toplevel1:
+
+    _DIRECTORY_PATH_ = './'
+
     def __init__(self, top=None):
-        self.analizer = LexicAnalizer()   # Initializing the lexic analizer
+        self.analyzer = LexicAnalyzer()   # Initializing the lexic analyzer
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -193,27 +199,27 @@ class Toplevel1:
                 command=self.debug)
 
         # Image files
-        self.image = Image.open("img/file-multiple.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/file-multiple.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_new_file = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/content-save.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/content-save.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/content-save-edit.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/content-save-edit.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save_as = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/folder-open.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/folder-open.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_open = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/play-pause.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/play-pause.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_compile = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/bug-check-outline.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/bug-check-outline.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_debug = ImageTk.PhotoImage(self.image)
 
@@ -265,14 +271,32 @@ class Toplevel1:
                 image = self.img_debug,
                 label = 'Depurar',
                 command = self.debug)
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Lexico')
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Sintactico')
+        self.menubar.add_command(
+                activebackground="#ececec",
+                activeforeground="#000000",
+                background="#d9d9d9",
+                foreground="#000000",
+                label = 'Semantico')
 
         self.style.configure('TNotebook.Tab', background=_bgcolor)
         self.style.configure('TNotebook.Tab', foreground=_fgcolor)
         self.style.map('TNotebook.Tab', background=
             [('selected', _compcolor), ('active',_ana2color)])
         self.compilerTabs = ttk.Notebook(top)
-        self.compilerTabs.place(relx=0.78, rely=0.016, relheight=0.644
-                , relwidth=0.211)
+        self.compilerTabs.place(relx=0.58, rely=0.016, relheight=0.644
+                , relwidth=0.411)
         self.compilerTabs.configure(takefocus="")
         self.compilerTabs_t1 = tk.Frame(self.compilerTabs)
         self.compilerTabs.add(self.compilerTabs_t1, padding=3)
@@ -323,33 +347,36 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(wrap="none")
 
-        self.Scrolledtext4 = ScrolledText(self.compilerTabs_t2)
-        self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021
-                , relwidth=1.036)
-        self.Scrolledtext4.configure(background="white")
-        self.Scrolledtext4.configure(font="TkTextFont")
-        self.Scrolledtext4.configure(foreground="black")
-        self.Scrolledtext4.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext4.configure(highlightcolor="black")
-        self.Scrolledtext4.configure(insertbackground="black")
-        self.Scrolledtext4.configure(insertborderwidth="3")
-        self.Scrolledtext4.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext4.configure(selectforeground="black")
-        self.Scrolledtext4.configure(wrap="none")
+        # Ventana treeview sintactico
+        self.Scrolledtext4 = ttk.Treeview(self.compilerTabs_t2, show='tree')
+        scrollbar_horizontal = ttk.Scrollbar(self.compilerTabs_t2, orient='horizontal', command = self.Scrolledtext4.xview)
+        scrollbar_vertical = ttk.Scrollbar(self.compilerTabs_t2, orient='vertical', command = self.Scrolledtext4.yview)
+        scrollbar_horizontal.pack(side='bottom', fill=tk.X)
+        scrollbar_vertical.pack(side='right', fill=tk.Y)
+        self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
+        self.Scrolledtext4.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
 
-        self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
-        self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
-                , relwidth=1.036)
-        self.Scrolledtext7.configure(background="white")
-        self.Scrolledtext7.configure(font="TkTextFont")
-        self.Scrolledtext7.configure(foreground="black")
-        self.Scrolledtext7.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext7.configure(highlightcolor="black")
-        self.Scrolledtext7.configure(insertbackground="black")
-        self.Scrolledtext7.configure(insertborderwidth="3")
-        self.Scrolledtext7.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext7.configure(selectforeground="black")
-        self.Scrolledtext7.configure(wrap="none")
+        # Ventana Treeview semantico
+        self.Scrolledtext7 = ttk.Treeview(self.compilerTabs_t3, show='tree')
+        scrollbar_horizontal = ttk.Scrollbar(self.compilerTabs_t3, orient='horizontal', command = self.Scrolledtext7.xview)
+        scrollbar_vertical = ttk.Scrollbar(self.compilerTabs_t3, orient='vertical', command = self.Scrolledtext7.yview)
+        scrollbar_horizontal.pack(side='bottom', fill=tk.X)
+        scrollbar_vertical.pack(side='right', fill=tk.Y)
+        self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
+        self.Scrolledtext7.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
+        # self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
+        # self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
+        #         , relwidth=1.036)
+        # self.Scrolledtext7.configure(background="white")
+        # self.Scrolledtext7.configure(font="TkTextFont")
+        # self.Scrolledtext7.configure(foreground="black")
+        # self.Scrolledtext7.configure(highlightbackground="#d9d9d9")
+        # self.Scrolledtext7.configure(highlightcolor="black")
+        # self.Scrolledtext7.configure(insertbackground="black")
+        # self.Scrolledtext7.configure(insertborderwidth="3")
+        # self.Scrolledtext7.configure(selectbackground="#c4c4c4")
+        # self.Scrolledtext7.configure(selectforeground="black")
+        # self.Scrolledtext7.configure(wrap="none")
 
         self.Scrolledtext8 = ScrolledText(self.compilerTabs_t4)
         self.Scrolledtext8.place(relx=0.0, rely=0.0, relheight=1.019
@@ -469,7 +496,7 @@ class Toplevel1:
         self.Scrolledtext10.configure(wrap="none")
 
         self.Scrolledtext1 = ScrolledText(top)
-        self.Scrolledtext1.place(relx=0.049, rely=0.016, relheight=0.646, relwidth=0.726)
+        self.Scrolledtext1.place(relx=0.049, rely=0.016, relheight=0.646, relwidth=0.526)
         self.Scrolledtext1.configure(background="white")
         self.Scrolledtext1.configure(font="TkTextFont")
         self.Scrolledtext1.configure(foreground="black")
@@ -585,15 +612,86 @@ class Toplevel1:
             print(e)
 
     def compile(self, *args):
+        lexicErrorFlag = 0
+        #Clearing all text boxes
         self.Scrolledtext3.delete(1.0, tk.END)
-        self.Scrolledtext5.delete(1.0, tk.END)
-        for token in self.analizer.tokens:
+        for i in self.Scrolledtext4.get_children():
+            self.Scrolledtext4.delete(i)
+        for i in self.Scrolledtext7.get_children():
+            self.Scrolledtext7.delete(i)
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
+        # self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
+        # self.Scrolledtext7.insert(tk.END, "Hola")
+        #Reseting sintactic analyzer globals
+        sintacticAnalyzer.ig = 0
+        sintacticAnalyzer.EOF = False
+        sintacticAnalyzer.tokens = []
+        sintacticAnalyzer.errors = []
+        sintacticAnalyzer.tree = []
+        semanticAnalyzer.ig = 0
+        semanticAnalyzer.EOF = False
+        semanticAnalyzer.tokens = []
+        semanticAnalyzer.errors = []
+        semanticAnalyzer.tree = []
+        semanticAnalyzer.hash = [None] * 211
+        #Printing tokens and lexic errors
+        for token in self.analyzer.tokens:
             if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
                 self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
             elif (str(token.tokenType) == "error"):
+                lexicErrorFlag = 1
                 self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
-        #os.system('echo "Compilando..."')
-        
+        #Filtering lexic tokens to pass them correctly to the sintactic analyzer
+        for token in self.analyzer.tokens:
+            token.line = self.pos_to_rowcol(token.start).split('.')[0]
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                sintacticAnalyzer.tokens.append(token)
+        #Doing sintactic analysis, getting the treeview and printing sintactic errors
+        if (sintacticAnalyzer.tokens != [] and lexicErrorFlag == 0):
+            self.sint_analyzer = sintacticAnalyzer.programa()
+            #Errors
+            for error in sintacticAnalyzer.errors:
+                self.Scrolledtext6.insert(tk.END, error + "\n")
+            #Treeview
+            self.verNodo(self.sint_analyzer,"")
+        semanticAnalyzer.tokens = sintacticAnalyzer.tokens
+        if (semanticAnalyzer.tokens != [] and lexicErrorFlag == 0 and len(sintacticAnalyzer.errors) == 0):
+            # self.Scrolledtext2.insert(tk.END, "Wenas\n")
+            self.sem_analyzer = semanticAnalyzer.programa()
+            #Errors
+            for error in semanticAnalyzer.errors:
+                self.Scrolledtext2.insert(tk.END, error + "\n")
+            #Treeview
+            # print(vars(self.sem_analyzer))
+            self.verNodoSemantico(self.sem_analyzer, "")
+
+    def verNodoSemantico(self, nodo, padre):
+        if(nodo != None):
+            item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
+            self.Scrolledtext7.item(item, open=True)#Showing the Treeview expanded
+            if str(nodo.dato) != "None":
+                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
+            for s in nodo.sibling:
+                self.verNodo(s,padre)
+            self.verNodoSemantico(nodo.hijo[0],item)
+            self.verNodoSemantico(nodo.hijo[1],item)
+            self.verNodoSemantico(nodo.hijo[2],item)
+        return
+
+    def verNodo(self, nodo, padre):
+        if(nodo != None):
+            item = self.Scrolledtext4.insert(padre, tk.END, text=str(nodo.nombre))
+            self.Scrolledtext4.item(item, open=True)#Showing the Treeview expanded
+            if str(nodo.dato) != "None":
+                self.Scrolledtext4.insert(item, tk.END, text=str(nodo.dato))
+            for s in nodo.sibling:
+                self.verNodo(s,padre)
+            self.verNodo(nodo.hijo[0],item)
+            self.verNodo(nodo.hijo[1],item)
+            self.verNodo(nodo.hijo[2],item)
+        return
+
     def debug(self, *args):
         os.system('echo "Depurando..."')
         
@@ -666,10 +764,10 @@ class Toplevel1:
         
     def update_code_screen(self, *args):
         self.statusbar.update_statusbar()
-        self.analizer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
+        self.analyzer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
         for tag in self.Scrolledtext1.tag_names():
             self.Scrolledtext1.tag_delete(tag)
-        for token in self.analizer.tokens:
+        for token in self.analyzer.tokens:
             self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
             self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
 
