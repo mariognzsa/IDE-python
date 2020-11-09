@@ -20,9 +20,17 @@ except ImportError:
     py3 = True
 
 import IDE_support
-from tkinter import filedialog
+try:
+    from tkinter import filedialog
+except ImportError:
+    import tkFileDialog as filedialog
 import os
+import PIL
 from PIL import Image, ImageTk
+
+from lexicAnalyzer import LexicAnalyzer, Token
+import sintacticAnalyzer
+import semanticAnalyzer
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -33,6 +41,7 @@ def vp_start_gui():
     root.mainloop()
 
 w = None
+
 def create_Toplevel1(rt, *args, **kwargs):
     '''Starting point when module is imported by another module.
        Correct form of call: 'create_Toplevel1(root, *args, **kwargs)' .'''
@@ -50,7 +59,11 @@ def destroy_Toplevel1():
     w = None
 
 class Toplevel1:
+
+    _DIRECTORY_PATH_ = './'
+
     def __init__(self, top=None):
+        self.analyzer = LexicAnalyzer()   # Initializing the lexic analyzer
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -186,27 +199,27 @@ class Toplevel1:
                 command=self.debug)
 
         # Image files
-        self.image = Image.open("img/file-multiple.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/file-multiple.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_new_file = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/content-save.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/content-save.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/content-save-edit.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/content-save-edit.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save_as = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/folder-open.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/folder-open.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_open = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/play-pause.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/play-pause.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_compile = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("img/bug-check-outline.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/bug-check-outline.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_debug = ImageTk.PhotoImage(self.image)
 
@@ -282,8 +295,8 @@ class Toplevel1:
         self.style.map('TNotebook.Tab', background=
             [('selected', _compcolor), ('active',_ana2color)])
         self.compilerTabs = ttk.Notebook(top)
-        self.compilerTabs.place(relx=0.78, rely=0.016, relheight=0.644
-                , relwidth=0.211)
+        self.compilerTabs.place(relx=0.58, rely=0.016, relheight=0.644
+                , relwidth=0.411)
         self.compilerTabs.configure(takefocus="")
         self.compilerTabs_t1 = tk.Frame(self.compilerTabs)
         self.compilerTabs.add(self.compilerTabs_t1, padding=3)
@@ -334,19 +347,13 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(wrap="none")
 
-        self.Scrolledtext4 = ScrolledText(self.compilerTabs_t2)
-        self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021
-                , relwidth=1.036)
-        self.Scrolledtext4.configure(background="white")
-        self.Scrolledtext4.configure(font="TkTextFont")
-        self.Scrolledtext4.configure(foreground="black")
-        self.Scrolledtext4.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext4.configure(highlightcolor="black")
-        self.Scrolledtext4.configure(insertbackground="black")
-        self.Scrolledtext4.configure(insertborderwidth="3")
-        self.Scrolledtext4.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext4.configure(selectforeground="black")
-        self.Scrolledtext4.configure(wrap="none")
+        self.Scrolledtext4 = ttk.Treeview(self.compilerTabs_t2, show='tree')
+        scrollbar_horizontal = ttk.Scrollbar(self.compilerTabs_t2, orient='horizontal', command = self.Scrolledtext4.xview)
+        scrollbar_vertical = ttk.Scrollbar(self.compilerTabs_t2, orient='vertical', command = self.Scrolledtext4.yview)
+        scrollbar_horizontal.pack(side='bottom', fill=tk.X)
+        scrollbar_vertical.pack(side='right', fill=tk.Y)
+        self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
+        self.Scrolledtext4.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
 
         self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
         self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
@@ -480,7 +487,7 @@ class Toplevel1:
         self.Scrolledtext10.configure(wrap="none")
 
         self.Scrolledtext1 = ScrolledText(top)
-        self.Scrolledtext1.place(relx=0.049, rely=0.016, relheight=0.646, relwidth=0.726)
+        self.Scrolledtext1.place(relx=0.049, rely=0.016, relheight=0.646, relwidth=0.526)
         self.Scrolledtext1.configure(background="white")
         self.Scrolledtext1.configure(font="TkTextFont")
         self.Scrolledtext1.configure(foreground="black")
@@ -523,6 +530,7 @@ class Toplevel1:
         self.set_window_title()
         self.update_rowCount()
         self.statusbar = Statusbar(self)
+        self.update_code_screen()
         self.bind_shortcuts()
         self.Scrolledtext1.focus()
 
@@ -534,9 +542,10 @@ class Toplevel1:
             root.title('Sin titulo - MaKen TextEditor')
 
     def new_file(self, *args):
-	    self.Scrolledtext1.delete(1.0, tk.END)
-	    self.filename = None
-	    self.set_window_title()
+        self.Scrolledtext1.delete(1.0, tk.END)
+        self.filename = None
+        self.set_window_title()
+        self.update_rowCount()
     
     def open_file(self, *args):
         self.filename = filedialog.askopenfilename(
@@ -555,7 +564,7 @@ class Toplevel1:
             self.set_window_title(self.filename)
             self.Scrolledtext1.mark_set('insert', '1.0')
         self.update_rowCount()
-        self.statusbar.update_statusbar()
+        self.update_code_screen()
 
     def save(self, *args):
         if self.filename:
@@ -594,8 +603,60 @@ class Toplevel1:
             print(e)
 
     def compile(self, *args):
-        os.system('echo "Compilando..."')
-        
+        lexicErrorFlag = 0
+        #Clearing all text boxes
+        self.Scrolledtext3.delete(1.0, tk.END)
+        for i in self.Scrolledtext4.get_children():
+            self.Scrolledtext4.delete(i)
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
+        self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
+        self.Scrolledtext7.insert(tk.END, "Hola")
+        #Reseting sintactic analyzer globals
+        sintacticAnalyzer.ig = 0
+        sintacticAnalyzer.EOF = False
+        sintacticAnalyzer.tokens = []
+        sintacticAnalyzer.errors = []
+        sintacticAnalyzer.tree = []
+        semanticAnalyzer.ig = 0
+        semanticAnalyzer.EOF = False
+        semanticAnalyzer.tokens = []
+        semanticAnalyzer.errors = []
+        semanticAnalyzer.tree = []
+        #Printing tokens and lexic errors
+        for token in self.analyzer.tokens:
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+            elif (str(token.tokenType) == "error"):
+                lexicErrorFlag = 1
+                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
+        #Filtering lexic tokens to pass them correctly to the sintactic analyzer
+        for token in self.analyzer.tokens:
+            token.line = self.pos_to_rowcol(token.start).split('.')[0]
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                sintacticAnalyzer.tokens.append(token)
+        #Doing sintactic analysis, getting the treeview and printing sintactic errors
+        if (sintacticAnalyzer.tokens != [] and lexicErrorFlag == 0):
+            self.sint_analyzer = sintacticAnalyzer.programa()
+            #Errors
+            for error in sintacticAnalyzer.errors:
+                self.Scrolledtext6.insert(tk.END, error + "\n")
+            #Treeview
+            self.verNodo(self.sint_analyzer,"")
+
+    def verNodo(self, nodo, padre):
+        if(nodo != None):
+            item = self.Scrolledtext4.insert(padre, tk.END, text=str(nodo.nombre))
+            self.Scrolledtext4.item(item, open=True)#Showing the Treeview expanded
+            if str(nodo.dato) != "None":
+                self.Scrolledtext4.insert(item, tk.END, text=str(nodo.dato))
+            for s in nodo.sibling:
+                self.verNodo(s,padre)
+            self.verNodo(nodo.hijo[0],item)
+            self.verNodo(nodo.hijo[1],item)
+            self.verNodo(nodo.hijo[2],item)
+        return
+
     def debug(self, *args):
         os.system('echo "Depurando..."')
         
@@ -619,12 +680,40 @@ class Toplevel1:
         root.bind('<1>', self.update_rowCount)
         root.bind('<Key>', self.update_rowCount)
         #root.bind('<Motion>', self.update_rowCount)
-        #root.bind('<MouseWheel>', self.update_rowCount)
+        root.bind('<MouseWheel>', self.update_rowCount) 
 
-        root.bind('<ButtonRelease-1>', self.statusbar.update_statusbar)
-        root.bind('<KeyRelease>', self.statusbar.update_statusbar)
-        root.bind('<Motion>', self.statusbar.update_statusbar)
+        root.bind('<ButtonRelease-1>', self.update_code_screen)
+        root.bind('<KeyRelease>', self.update_code_screen)
+        root.bind('<Motion>', self.update_code_screen)
         #root.bind('<MouseWheel>', self.statusbar.update_statusbar)
+
+    def wordColor(self, type):
+        if (type == "identifier"):
+            return "black"
+        elif (type == "integer" or type == "float"):
+            return "deeppink"
+        elif (type == "oneline_commentary" or type == "multiline_commentary"):
+            return "gray"
+        elif (type == "restricted_word" or type == "end_sentence"):
+            return "blue"
+        elif (type == "operator" or type == "special_character"):
+            return "green"
+        elif (type == "error"):
+            return "red"
+
+    def pos_to_rowcol(self, pos):
+        rcount=1
+        ccount=0
+        count=0
+        text=self.Scrolledtext1.get(1.0, tk.END)
+        while (count<pos):
+            if (text[count] == '\n'):
+                ccount=0
+                rcount+=1
+            else:
+                ccount+=1
+            count+=1
+        return str(rcount)+"."+str(ccount)
 
     def update_rowCount(self, *args):
         coordenadas = self.Scrolledtext1.index(tk.END).split('.')
@@ -637,7 +726,15 @@ class Toplevel1:
         self.Text1.insert(tk.END, cadNums.strip('\n'))
         self.Text1.config(state=tk.DISABLED)
         self.Text1.yview_moveto(self.Scrolledtext1.yview()[0])
-    #
+        
+    def update_code_screen(self, *args):
+        self.statusbar.update_statusbar()
+        self.analyzer.analizeCode(self.Scrolledtext1.get(1.0, tk.END))
+        for tag in self.Scrolledtext1.tag_names():
+            self.Scrolledtext1.tag_delete(tag)
+        for token in self.analyzer.tokens:
+            self.Scrolledtext1.tag_configure(str(token.id), foreground=self.wordColor(str(token.tokenType)))
+            self.Scrolledtext1.tag_add(str(token.id), self.pos_to_rowcol(token.start), self.pos_to_rowcol(token.end))     
 
 class Statusbar:
     
