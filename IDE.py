@@ -280,19 +280,22 @@ class Toplevel1:
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label = 'Lexico')
+                label = 'Lexico',
+                command=self.compile_lexic)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label = 'Sintactico')
+                label = 'Sintactico',
+                command=self.compile_sintactic)
         self.menubar.add_command(
                 activebackground="#ececec",
                 activeforeground="#000000",
                 background="#d9d9d9",
                 foreground="#000000",
-                label = 'Semantico')
+                label = 'Semantico',
+                command=self.compile_semantic)
 
         self.style.configure('TNotebook.Tab', background=_bgcolor)
         self.style.configure('TNotebook.Tab', foreground=_fgcolor)
@@ -569,6 +572,17 @@ class Toplevel1:
                 self.Scrolledtext1.insert(1.0, file.read())
             self.set_window_title(self.filename)
             self.Scrolledtext1.mark_set('insert', '1.0')
+            #Clearing all text boxes
+            self.Scrolledtext3.delete(1.0, tk.END)
+            for i in self.Scrolledtext4.get_children():
+                self.Scrolledtext4.delete(i)
+            for i in self.Scrolledtext7.get_children():
+                self.Scrolledtext7.delete(i)
+            for i in self.table.get_children():
+                self.table.delete(i)
+            self.Scrolledtext5.delete(1.0, tk.END)#Ventana de errores de Lexico
+            self.Scrolledtext6.delete(1.0, tk.END)#Ventana de errores de Sintactico
+            self.Scrolledtext2.delete(1.0, tk.END)#Ventana de errores de Semantico
         self.update_rowCount()
         self.update_code_screen()
 
@@ -608,7 +622,27 @@ class Toplevel1:
         except Exception as e:
             print(e)
 
-    def compile(self, *args):
+    def compile_lexic(self, *args):
+        #Clearing all text boxes
+        self.Scrolledtext3.delete(1.0, tk.END)
+        for i in self.Scrolledtext4.get_children():
+            self.Scrolledtext4.delete(i)
+        for i in self.Scrolledtext7.get_children():
+            self.Scrolledtext7.delete(i)
+        for i in self.table.get_children():
+            self.table.delete(i)
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de errores de Lexico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de errores de Sintactico
+        self.Scrolledtext2.delete(1.0, tk.END)#Ventana de errores de Semantico
+
+        #Printing tokens and lexic errors
+        for token in self.analyzer.tokens:
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+            elif (str(token.tokenType) == "error"):
+                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
+
+    def compile_sintactic(self, *args):
         lexicErrorFlag = 0
         #Clearing all text boxes
         self.Scrolledtext3.delete(1.0, tk.END)
@@ -618,16 +652,58 @@ class Toplevel1:
             self.Scrolledtext7.delete(i)
         for i in self.table.get_children():
             self.table.delete(i)
-        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de errores de Lexico
         self.Scrolledtext6.delete(1.0, tk.END)#Ventana de errores de Sintactico
         self.Scrolledtext2.delete(1.0, tk.END)#Ventana de errores de Semantico
-        # self.Scrolledtext8.insert(tk.END, "Hola")
+
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
         sintacticAnalyzer.EOF = False
         sintacticAnalyzer.tokens = []
         sintacticAnalyzer.errors = []
         sintacticAnalyzer.tree = []
+        #Printing tokens and lexic errors
+        for token in self.analyzer.tokens:
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+            elif (str(token.tokenType) == "error"):
+                lexicErrorFlag = 1
+                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
+        #Filtering lexic tokens to pass them correctly to the sintactic analyzer
+        for token in self.analyzer.tokens:
+            token.line = self.pos_to_rowcol(token.start).split('.')[0]
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                sintacticAnalyzer.tokens.append(token)
+        #Doing sintactic analysis, getting the treeview and printing sintactic errors
+        if (sintacticAnalyzer.tokens != [] and lexicErrorFlag == 0):
+            self.sint_analyzer = sintacticAnalyzer.programa()
+            #Errors
+            for error in sintacticAnalyzer.errors:
+                self.Scrolledtext6.insert(tk.END, error + "\n")
+            #Treeview
+            self.verNodo(self.sint_analyzer,"")
+
+    def compile_semantic(self, *args):
+        lexicErrorFlag = 0
+        #Clearing all text boxes
+        self.Scrolledtext3.delete(1.0, tk.END)
+        for i in self.Scrolledtext4.get_children():
+            self.Scrolledtext4.delete(i)
+        for i in self.Scrolledtext7.get_children():
+            self.Scrolledtext7.delete(i)
+        for i in self.table.get_children():
+            self.table.delete(i)
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de errores de Lexico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de errores de Sintactico
+        self.Scrolledtext2.delete(1.0, tk.END)#Ventana de errores de Semantico
+
+        #Reseting sintactic analyzer globals
+        sintacticAnalyzer.ig = 0
+        sintacticAnalyzer.EOF = False
+        sintacticAnalyzer.tokens = []
+        sintacticAnalyzer.errors = []
+        sintacticAnalyzer.tree = []
+        #Reseting semantic analyzer globals
         semanticAnalyzer.ig = 0
         semanticAnalyzer.EOF = False
         semanticAnalyzer.tokens = []
@@ -654,6 +730,77 @@ class Toplevel1:
                 self.Scrolledtext6.insert(tk.END, error + "\n")
             #Treeview
             self.verNodo(self.sint_analyzer,"")
+        #Doing semantic analysis, getting the treeview and printing semantic errors
+        semanticAnalyzer.tokens = sintacticAnalyzer.tokens
+        if (semanticAnalyzer.tokens != [] and lexicErrorFlag == 0 and len(sintacticAnalyzer.errors) == 0):
+            # self.Scrolledtext2.insert(tk.END, "Wenas\n")
+            self.sem_analyzer = semanticAnalyzer.programa()
+            #Errors
+            for error in semanticAnalyzer.errors:
+                self.Scrolledtext2.insert(tk.END, error + "\n")
+            #Treeview
+            # semanticAnalyzer.verNodo(self.sem_analyzer)
+            self.verNodoSemantico(self.sem_analyzer, "")
+            # Hash table generation
+            iterador = 0
+            for hash_row in semanticAnalyzer.hash:
+                if hash_row != None:
+                    print(str(hash_row[0]) + "#" + str(hash_row[1]) + "#" + str(hash_row[2]) + "#")
+                    print('|'.join(hash_row[3]) + "\n")
+                    self.table.insert('', 'end', iid=iterador,
+                            values = tuple(hash_row))
+                    iterador += 1
+
+    def compile(self, *args):
+        lexicErrorFlag = 0
+        #Clearing all text boxes
+        self.Scrolledtext3.delete(1.0, tk.END)
+        for i in self.Scrolledtext4.get_children():
+            self.Scrolledtext4.delete(i)
+        for i in self.Scrolledtext7.get_children():
+            self.Scrolledtext7.delete(i)
+        for i in self.table.get_children():
+            self.table.delete(i)
+        self.Scrolledtext5.delete(1.0, tk.END)#Ventana de errores de Lexico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de errores de Sintactico
+        self.Scrolledtext2.delete(1.0, tk.END)#Ventana de errores de Semantico
+
+        # self.Scrolledtext8.insert(tk.END, "Hola")
+
+        #Reseting sintactic analyzer globals
+        sintacticAnalyzer.ig = 0
+        sintacticAnalyzer.EOF = False
+        sintacticAnalyzer.tokens = []
+        sintacticAnalyzer.errors = []
+        sintacticAnalyzer.tree = []
+        #Reseting semantic analyzer globals
+        semanticAnalyzer.ig = 0
+        semanticAnalyzer.EOF = False
+        semanticAnalyzer.tokens = []
+        semanticAnalyzer.errors = []
+        semanticAnalyzer.tree = []
+        semanticAnalyzer.hash = [None] * 211
+        #Printing tokens and lexic errors
+        for token in self.analyzer.tokens:
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                self.Scrolledtext3.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+"\n")
+            elif (str(token.tokenType) == "error"):
+                lexicErrorFlag = 1
+                self.Scrolledtext5.insert(tk.END, str(token.token)+" -> "+str(token.tokenType)+", linea " + self.pos_to_rowcol(token.start).split('.')[0] + "\n")
+        #Filtering lexic tokens to pass them correctly to the sintactic analyzer
+        for token in self.analyzer.tokens:
+            token.line = self.pos_to_rowcol(token.start).split('.')[0]
+            if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
+                sintacticAnalyzer.tokens.append(token)
+        #Doing sintactic analysis, getting the treeview and printing sintactic errors
+        if (sintacticAnalyzer.tokens != [] and lexicErrorFlag == 0):
+            self.sint_analyzer = sintacticAnalyzer.programa()
+            #Errors
+            for error in sintacticAnalyzer.errors:
+                self.Scrolledtext6.insert(tk.END, error + "\n")
+            #Treeview
+            self.verNodo(self.sint_analyzer,"")
+        #Doing semantic analysis, getting the treeview and printing semantic errors
         semanticAnalyzer.tokens = sintacticAnalyzer.tokens
         if (semanticAnalyzer.tokens != [] and lexicErrorFlag == 0 and len(sintacticAnalyzer.errors) == 0):
             # self.Scrolledtext2.insert(tk.END, "Wenas\n")
