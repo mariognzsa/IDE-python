@@ -411,6 +411,7 @@ class Toplevel1:
         self.errorTabs_t1.configure(background="#d9d9d9")
         self.errorTabs_t1.configure(highlightbackground="#d9d9d9")
         self.errorTabs_t1.configure(highlightcolor="black")
+
         self.errorTabs_t2 = tk.Frame(self.errorTabs)
         self.errorTabs.add(self.errorTabs_t2, padding=3)
         self.errorTabs.tab(1, text="Errores Sintacticos", compound="left"
@@ -418,6 +419,7 @@ class Toplevel1:
         self.errorTabs_t2.configure(background="#d9d9d9")
         self.errorTabs_t2.configure(highlightbackground="#d9d9d9")
         self.errorTabs_t2.configure(highlightcolor="black")
+
         self.errorTabs_t3 = tk.Frame(self.errorTabs)
         self.errorTabs.add(self.errorTabs_t3, padding=3)
         self.errorTabs.tab(2, text="Errores Semanticos", compound="none"
@@ -425,6 +427,7 @@ class Toplevel1:
         self.errorTabs_t3.configure(background="#d9d9d9")
         self.errorTabs_t3.configure(highlightbackground="#d9d9d9")
         self.errorTabs_t3.configure(highlightcolor="black")
+
         self.errorTabs_t4 = tk.Frame(self.errorTabs)
         self.errorTabs.add(self.errorTabs_t4, padding=3)
         self.errorTabs.tab(3, text="Resultados", compound="none", underline="-1"
@@ -438,7 +441,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext5.configure(background="white")
         self.Scrolledtext5.configure(font="TkTextFont")
-        self.Scrolledtext5.configure(foreground="black")
+        self.Scrolledtext5.configure(foreground="red3")
         self.Scrolledtext5.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext5.configure(highlightcolor="black")
         self.Scrolledtext5.configure(insertbackground="black")
@@ -452,7 +455,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext6.configure(background="white")
         self.Scrolledtext6.configure(font="TkTextFont")
-        self.Scrolledtext6.configure(foreground="black")
+        self.Scrolledtext6.configure(foreground="red3")
         self.Scrolledtext6.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext6.configure(highlightcolor="black")
         self.Scrolledtext6.configure(insertbackground="black")
@@ -466,7 +469,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext2.configure(background="white")
         self.Scrolledtext2.configure(font="TkTextFont")
-        self.Scrolledtext2.configure(foreground="black")
+        self.Scrolledtext2.configure(foreground="red3")
         self.Scrolledtext2.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext2.configure(highlightcolor="black")
         self.Scrolledtext2.configure(insertbackground="black")
@@ -480,7 +483,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext10.configure(background="white")
         self.Scrolledtext10.configure(font="TkTextFont")
-        self.Scrolledtext10.configure(foreground="black")
+        self.Scrolledtext10.configure(foreground="red3")
         self.Scrolledtext10.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext10.configure(highlightcolor="black")
         self.Scrolledtext10.configure(insertbackground="black")
