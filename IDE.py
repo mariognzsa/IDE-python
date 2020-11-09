@@ -616,9 +616,11 @@ class Toplevel1:
             self.Scrolledtext4.delete(i)
         for i in self.Scrolledtext7.get_children():
             self.Scrolledtext7.delete(i)
+        for i in self.table.get_children():
+            self.table.delete(i)
         self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
-        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
-        # self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
+        self.Scrolledtext6.delete(1.0, tk.END)#Ventana de errores de Sintactico
+        self.Scrolledtext2.delete(1.0, tk.END)#Ventana de errores de Semantico
         # self.Scrolledtext8.insert(tk.END, "Hola")
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
@@ -680,11 +682,16 @@ class Toplevel1:
                 item = self.Scrolledtext7.insert(padre, tk.END, text=str(''))
             self.Scrolledtext7.item(item, open=True)#Showing the Treeview expanded
             if str(nodo.dato) != "None":
-                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
+                if str(nodo.nombre) == "integer" or str(nodo.nombre) == "float":
+                    self.Scrolledtext7.insert(item, tk.END, text="Numero: "+str(nodo.dato))
+                elif str(nodo.nombre) == "identifier":
+                    self.Scrolledtext7.insert(item, tk.END, text="Variable: "+str(nodo.dato))
+                else:
+                    self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
             if str(nodo.tipo) != "None":
-                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.tipo))
-            if str(nodo.valor) != "None":
-                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.valor))
+                self.Scrolledtext7.insert(item, tk.END, text="Tipo: "+str(nodo.tipo))
+            if str(nodo.valor) != "None" and str(nodo.valor) != "":
+                self.Scrolledtext7.insert(item, tk.END, text="Valor: "+str(nodo.valor))
             for s in nodo.sibling:
                 self.verNodoSemantico(s,padre)
             self.verNodoSemantico(nodo.hijo[0],item)
