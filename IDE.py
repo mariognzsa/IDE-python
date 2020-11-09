@@ -32,6 +32,8 @@ from lexicAnalyzer import LexicAnalyzer, Token
 import sintacticAnalyzer
 import semanticAnalyzer
 
+from pprint import pprint
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -663,17 +665,24 @@ class Toplevel1:
             for error in semanticAnalyzer.errors:
                 self.Scrolledtext2.insert(tk.END, error + "\n")
             #Treeview
-            # print(vars(self.sem_analyzer))
+            # semanticAnalyzer.verNodo(self.sem_analyzer)
             self.verNodoSemantico(self.sem_analyzer, "")
 
     def verNodoSemantico(self, nodo, padre):
         if(nodo != None):
-            item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
+            if str(nodo.nombre) != "None":
+                item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
+            else:
+                item = self.Scrolledtext7.insert(padre, tk.END, text=str(''))
             self.Scrolledtext7.item(item, open=True)#Showing the Treeview expanded
             if str(nodo.dato) != "None":
                 self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
+            if str(nodo.tipo) != "None":
+                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.tipo))
+            if str(nodo.valor) != "None":
+                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.valor))
             for s in nodo.sibling:
-                self.verNodo(s,padre)
+                self.verNodoSemantico(s,padre)
             self.verNodoSemantico(nodo.hijo[0],item)
             self.verNodoSemantico(nodo.hijo[1],item)
             self.verNodoSemantico(nodo.hijo[2],item)
