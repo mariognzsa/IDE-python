@@ -32,6 +32,8 @@ from lexicAnalyzer import LexicAnalyzer, Token
 import sintacticAnalyzer
 import semanticAnalyzer
 
+from ttkwidgets import Table
+
 from pprint import pprint
 
 def vp_start_gui():
@@ -366,34 +368,24 @@ class Toplevel1:
         scrollbar_vertical.pack(side='right', fill=tk.Y)
         self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
         self.Scrolledtext7.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
-        # self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
-        # self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
-        #         , relwidth=1.036)
-        # self.Scrolledtext7.configure(background="white")
-        # self.Scrolledtext7.configure(font="TkTextFont")
-        # self.Scrolledtext7.configure(foreground="black")
-        # self.Scrolledtext7.configure(highlightbackground="#d9d9d9")
-        # self.Scrolledtext7.configure(highlightcolor="black")
-        # self.Scrolledtext7.configure(insertbackground="black")
-        # self.Scrolledtext7.configure(insertborderwidth="3")
-        # self.Scrolledtext7.configure(selectbackground="#c4c4c4")
-        # self.Scrolledtext7.configure(selectforeground="black")
-        # self.Scrolledtext7.configure(wrap="none")
 
-        self.Scrolledtext8 = ScrolledText(self.compilerTabs_t4)
-        self.Scrolledtext8.place(relx=0.0, rely=0.0, relheight=1.019
-                , relwidth=1.036)
-        self.Scrolledtext8.configure(background="white")
-        self.Scrolledtext8.configure(font="TkTextFont")
-        self.Scrolledtext8.configure(foreground="black")
-        self.Scrolledtext8.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext8.configure(highlightcolor="black")
-        self.Scrolledtext8.configure(insertbackground="black")
-        self.Scrolledtext8.configure(insertborderwidth="3")
-        self.Scrolledtext8.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext8.configure(selectforeground="black")
-        self.Scrolledtext8.configure(wrap="none")
+        # Ventana de Hash table
+        columns = ["Variable", "Tipo", "Valor", "Linea"]
+        self.table = Table(self.compilerTabs_t4, columns=columns, sortable=False, drag_cols=False,
+                    drag_rows=False)
+        for col in columns:
+            self.table.heading(col, text=col)
+            self.table.column(col, width=135, stretch=False)
 
+        sx = tk.Scrollbar(self.compilerTabs_t4, orient='horizontal', command=self.table.xview)
+        sy = tk.Scrollbar(self.compilerTabs_t4, orient='vertical', command=self.table.yview)
+        self.table.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
+
+        self.table.grid(sticky='ewns')
+        sx.grid(row=1, column=0, sticky='ew')
+        sy.grid(row=0, column=1, sticky='ns')
+
+        # Ventana de no se que del final
         self.Scrolledtext9 = ScrolledText(self.compilerTabs_t5)
         self.Scrolledtext9.place(relx=0.0, rely=0.0, relheight=1.019
                 , relwidth=1.036)
@@ -624,7 +616,7 @@ class Toplevel1:
         self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
         self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
         # self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
-        # self.Scrolledtext7.insert(tk.END, "Hola")
+        # self.Scrolledtext8.insert(tk.END, "Hola")
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
         sintacticAnalyzer.EOF = False
@@ -667,6 +659,15 @@ class Toplevel1:
             #Treeview
             # semanticAnalyzer.verNodo(self.sem_analyzer)
             self.verNodoSemantico(self.sem_analyzer, "")
+            # Hash table generation
+            iterador = 0
+            for hash_row in semanticAnalyzer.hash:
+                if hash_row != None:
+                    print(str(hash_row[0]) + "#" + str(hash_row[1]) + "#" + str(hash_row[2]) + "#")
+                    print('|'.join(hash_row[3]) + "\n")
+                    self.table.insert('', 'end', iid=iterador,
+                            values = tuple(hash_row))
+                    iterador += 1
 
     def verNodoSemantico(self, nodo, padre):
         if(nodo != None):

@@ -37,10 +37,10 @@ def setHash(variable, tipo, valor, linea,proviene):
         hash[position] = [variable,tipo,valor,[linea]]
         return 1
     elif l == None and proviene == 0:
-        error(1,"Variable " + variable + " no declarada",str(l[3]))
+        error(1,"Variable " + variable + " no declarada",str(linea))
         return -2#hubo un error y ya fue declarada
-    elif l[1] != tipo and proviene != 0:
-        error(1,"Variable " + variable + " ya declarada",str(l[3]))
+    elif (l[1] != tipo and proviene != 0) or (linea in l[3] != tipo and proviene != 0):
+        error(1,"Variable " + variable + " ya declarada",str(l[3][0]))
         return -1#hubo un error y ya fue declarada
     else:
         return 2#ya existe en la tabla y podríamos añadir una linea
@@ -243,10 +243,11 @@ def sent_cin():
     nuevo = Nodo()
     temp.nombre = "Cin"
     match('cin')
-    tipoHash = getHash(temp.dato, tokens[ig].line)
+    tipoHash = getHash(tokens[ig].token, tokens[ig].line)
     if len(tipoHash) > 0:
-        nuevo.nombre = "identifier"
-        nuevo.dato = tokens[ig].token
+        # nuevo.nombre = "identifier"
+        # nuevo.dato = tokens[ig].token
+        nuevo = fin(tipoHash[1])
         temp.hijo[0] = nuevo
         match(';')
         return temp
@@ -263,7 +264,7 @@ def sent_cout():
     temp = Nodo()
     temp.nombre = "Cout"
     match('cout')
-    tipoHash = getHash(temp.dato, tokens[ig].line)
+    tipoHash = getHash(tokens[ig].token, tokens[ig].line)
     if len(tipoHash) > 0:
         temp.hijo[0] = expresion(tipoHash[1])
         match(';')
@@ -294,13 +295,14 @@ def asignacion():
     tipoHash = getHash(tokens[ig].token, tokens[ig].line)
     
     if len(tipoHash) > 0:
-        temp.nombre = "Variable"
-        temp.dato = tokens[ig].token
-        temp.valor = tipoHash[2]
-        if ig < len(tokens)-1:
-            ig += 1
-        else:
-            error(1,"Error en el fin del programa.",tokens[ig].line)
+        # temp.nombre = "Variable"
+        # temp.dato = tokens[ig].token
+        # temp.valor = tipoHash[2]
+        # if ig < len(tokens)-1:
+        #     ig += 1
+        # else:
+        #     error(1,"Error en el fin del programa.",tokens[ig].line)
+        temp = fin(tipoHash[1])
         
         if tokens[ig].token == ":=" or (tokens[ig].token != "++" and tokens[ig].token != "--"):
             match(':=')
@@ -647,15 +649,37 @@ def fin(tipo,proviene = 0):
         temp.nombre = tokens[ig].tokenType
         temp.dato = tokens[ig].token
         temp.tipo = "int"
-        temp.valor = temp.dato
+        # temp.valor = temp.dato
+        if tipo == 'int':
+            if temp.tipo == 'float':
+                temp.valor = str(int(float(tokens[ig].token)))
+            else:
+                temp.valor = str(int(tokens[ig].token))
+        else:
+            if temp.tipo == 'int':
+                temp.valor = str(float(int(tokens[ig].token)))
+            else:
+                temp.valor = str(float(tokens[ig].token))
         if ig < len(tokens)-1:
             ig += 1
         else:
             error(1,"Error en el fin del programa.",tokens[ig].line)
+
     elif tokens[ig].tokenType == "float":
+        temp.nombre = tokens[ig].tokenType
         temp.dato = tokens[ig].token
         temp.tipo = "float"
-        temp.valor = temp.dato
+        # temp.valor = temp.dato
+        if tipo == 'int':
+            if temp.tipo == 'float':
+                temp.valor = str(int(float(tokens[ig].token)))
+            else:
+                temp.valor = str(int(tokens[ig].token))
+        else:
+            if temp.tipo == 'int':
+                temp.valor = str(float(int(tokens[ig].token)))
+            else:
+                temp.valor = str(float(tokens[ig].token))
         if ig < len(tokens)-1:
             ig += 1
         else:
@@ -689,7 +713,10 @@ def error(op, token, line):
 def verNodo(nodo):
     if(nodo != None):
         print("Nodo-> " + str(nodo.nombre))
-        print("Valor-> " + str(nodo.dato))
+        print("Dato-> " + str(nodo.dato))
+        print("Tipo-> " + str(nodo.tipo))
+        print("Valor-> " + str(nodo.valor))
+        print('\n')
         for s in nodo.sibling:
             verNodo(s)
         verNodo(nodo.hijo[0])
