@@ -23,6 +23,8 @@ class Nodo(object):
 def getPosition(name):
     temp = 0
     i = 0
+    if(name == None):
+        return temp
     for caracter in name:
         temp = ((temp << 32) + ord(caracter[i])) % 211
     return temp
@@ -48,7 +50,8 @@ def getHash(variable,linea):
     position = getPosition(variable)
     l =  hash[position]
     if l == None:
-        error(1,"Variable " + variable + " no declarada",linea)
+        if variable != None:
+            error(1,"Variable " + variable + " no declarada",linea)
         return []
     else:
         return l
@@ -80,9 +83,9 @@ def match(tokensActual):
             ig += 1
         else:
             EOF = True
-    else:
+    # else:
         #print(tokens[ig].token)
-        error(0, tokensActual, tokens[ig].line)    
+        # error(0, tokensActual, tokens[ig].line)    
 
 def programa():
     global ig
@@ -293,6 +296,7 @@ def asignacion():
     if len(tipoHash) > 0:
         temp.nombre = "Variable"
         temp.dato = tokens[ig].token
+        temp.valor = tipoHash[2]
         if ig < len(tokens)-1:
             ig += 1
         else:
@@ -342,10 +346,11 @@ def asignacion():
                     setHashValue(temp.dato, nuevo.valor, tokens[ig].line)
                 else:
                     error(1,"Sin valor la variable: "+ temp.dato,tokens[ig].line)
-                    while (temp.dato != ';'):
+                    while (tokens[ig].token != ';'):
                         if ig < len(tokens)-1:
                             ig += 1
                         else:
+                            # print(tokens[ig].line)
                             error(1,"Error en el fin del programa.",tokens[ig].line)
                     if ig < len(tokens)-1:
                         ig += 1

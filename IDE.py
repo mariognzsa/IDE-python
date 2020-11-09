@@ -347,6 +347,7 @@ class Toplevel1:
         self.Scrolledtext3.configure(selectforeground="black")
         self.Scrolledtext3.configure(wrap="none")
 
+        # Ventana treeview sintactico
         self.Scrolledtext4 = ttk.Treeview(self.compilerTabs_t2, show='tree')
         scrollbar_horizontal = ttk.Scrollbar(self.compilerTabs_t2, orient='horizontal', command = self.Scrolledtext4.xview)
         scrollbar_vertical = ttk.Scrollbar(self.compilerTabs_t2, orient='vertical', command = self.Scrolledtext4.yview)
@@ -355,19 +356,27 @@ class Toplevel1:
         self.Scrolledtext4.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
         self.Scrolledtext4.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
 
-        self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
-        self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
-                , relwidth=1.036)
-        self.Scrolledtext7.configure(background="white")
-        self.Scrolledtext7.configure(font="TkTextFont")
-        self.Scrolledtext7.configure(foreground="black")
-        self.Scrolledtext7.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext7.configure(highlightcolor="black")
-        self.Scrolledtext7.configure(insertbackground="black")
-        self.Scrolledtext7.configure(insertborderwidth="3")
-        self.Scrolledtext7.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext7.configure(selectforeground="black")
-        self.Scrolledtext7.configure(wrap="none")
+        # Ventana Treeview semantico
+        self.Scrolledtext7 = ttk.Treeview(self.compilerTabs_t3, show='tree')
+        scrollbar_horizontal = ttk.Scrollbar(self.compilerTabs_t3, orient='horizontal', command = self.Scrolledtext7.xview)
+        scrollbar_vertical = ttk.Scrollbar(self.compilerTabs_t3, orient='vertical', command = self.Scrolledtext7.yview)
+        scrollbar_horizontal.pack(side='bottom', fill=tk.X)
+        scrollbar_vertical.pack(side='right', fill=tk.Y)
+        self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
+        self.Scrolledtext7.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
+        # self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
+        # self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
+        #         , relwidth=1.036)
+        # self.Scrolledtext7.configure(background="white")
+        # self.Scrolledtext7.configure(font="TkTextFont")
+        # self.Scrolledtext7.configure(foreground="black")
+        # self.Scrolledtext7.configure(highlightbackground="#d9d9d9")
+        # self.Scrolledtext7.configure(highlightcolor="black")
+        # self.Scrolledtext7.configure(insertbackground="black")
+        # self.Scrolledtext7.configure(insertborderwidth="3")
+        # self.Scrolledtext7.configure(selectbackground="#c4c4c4")
+        # self.Scrolledtext7.configure(selectforeground="black")
+        # self.Scrolledtext7.configure(wrap="none")
 
         self.Scrolledtext8 = ScrolledText(self.compilerTabs_t4)
         self.Scrolledtext8.place(relx=0.0, rely=0.0, relheight=1.019
@@ -608,10 +617,12 @@ class Toplevel1:
         self.Scrolledtext3.delete(1.0, tk.END)
         for i in self.Scrolledtext4.get_children():
             self.Scrolledtext4.delete(i)
+        for i in self.Scrolledtext7.get_children():
+            self.Scrolledtext7.delete(i)
         self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
         self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
-        self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
-        self.Scrolledtext7.insert(tk.END, "Hola")
+        # self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
+        # self.Scrolledtext7.insert(tk.END, "Hola")
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
         sintacticAnalyzer.EOF = False
@@ -623,6 +634,7 @@ class Toplevel1:
         semanticAnalyzer.tokens = []
         semanticAnalyzer.errors = []
         semanticAnalyzer.tree = []
+        semanticAnalyzer.hash = [None] * 211
         #Printing tokens and lexic errors
         for token in self.analyzer.tokens:
             if (str(token.tokenType) != "error" and str(token.tokenType) != "oneline_commentary" and str(token.tokenType) != "multiline_commentary"):
@@ -643,6 +655,29 @@ class Toplevel1:
                 self.Scrolledtext6.insert(tk.END, error + "\n")
             #Treeview
             self.verNodo(self.sint_analyzer,"")
+        semanticAnalyzer.tokens = sintacticAnalyzer.tokens
+        if (semanticAnalyzer.tokens != [] and lexicErrorFlag == 0 and len(sintacticAnalyzer.errors) == 0):
+            # self.Scrolledtext2.insert(tk.END, "Wenas\n")
+            self.sem_analyzer = semanticAnalyzer.programa()
+            #Errors
+            for error in semanticAnalyzer.errors:
+                self.Scrolledtext2.insert(tk.END, error + "\n")
+            #Treeview
+            # print(vars(self.sem_analyzer))
+            self.verNodoSemantico(self.sem_analyzer, "")
+
+    def verNodoSemantico(self, nodo, padre):
+        if(nodo != None):
+            item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
+            self.Scrolledtext7.item(item, open=True)#Showing the Treeview expanded
+            if str(nodo.dato) != "None":
+                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
+            for s in nodo.sibling:
+                self.verNodo(s,padre)
+            self.verNodoSemantico(nodo.hijo[0],item)
+            self.verNodoSemantico(nodo.hijo[1],item)
+            self.verNodoSemantico(nodo.hijo[2],item)
+        return
 
     def verNodo(self, nodo, padre):
         if(nodo != None):
