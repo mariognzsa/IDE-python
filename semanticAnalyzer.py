@@ -37,10 +37,10 @@ def setHash(variable, tipo, valor, linea,proviene):
         hash[position] = [variable,tipo,valor,[linea]]
         return 1
     elif l == None and proviene == 0:
-        error(1,"Variable " + variable + " no declarada",str(l[3]))
+        error(1,"[Error] - La variable \"" + variable + "\" no ha sido declarada",str(linea))
         return -2#hubo un error y ya fue declarada
-    elif l[1] != tipo and proviene != 0:
-        error(1,"Variable " + variable + " ya declarada",str(l[3]))
+    elif (l[1] != tipo and proviene != 0) or (linea in l[3] != tipo and proviene != 0):
+        error(1,"[Error] - La variable \"" + variable + "\" ya ha sido declarada",str(l[3][0]))
         return -1#hubo un error y ya fue declarada
     else:
         return 2#ya existe en la tabla y podríamos añadir una linea
@@ -51,7 +51,7 @@ def getHash(variable,linea):
     l =  hash[position]
     if l == None:
         if variable != None:
-            error(1,"Variable " + variable + " no declarada",linea)
+            error(1,"[Error] - La variable \"" + variable + "\" no ha sido declarada",linea)
         return []
     else:
         return l
@@ -61,7 +61,7 @@ def setHashValue(variable,valor,linea):
     position = getPosition(variable)
     l =  hash[position]
     if l == None:
-        error(1,"Variable " + variable + " no declarada", str(linea))
+        error(1,"[Error] - La variable \"" + variable + "\" no ha sido declarada", str(linea))
     else:
         hash[position] = [l[0],l[1],valor,l[3]]
        
@@ -69,7 +69,7 @@ def setHashLine(variable, linea):
     position = getPosition(variable)
     l = hash[position]
     if l == None:
-        error(1,"Variable " + variable + " no declarada", str(linea))
+        error(1,"[Error] - La variable \"" + variable + "\" no ha sido declarada", str(linea))
     else:
         l[3].append(linea)
         hash[position] = [l[0], l[1], l[2], l[3]]
@@ -100,7 +100,7 @@ def programa():
     if not EOF:
         match('}')
     else:
-        error(1,"Error. Main inconcluso, falta cerrar llave.", tokens[ig].line)
+        error(1,"[Error] - Main inconcluso, falta cerrar llave.", tokens[ig].line)
     return temp
 
 def lista_declaracion():
@@ -243,10 +243,11 @@ def sent_cin():
     nuevo = Nodo()
     temp.nombre = "Cin"
     match('cin')
-    tipoHash = getHash(temp.dato, tokens[ig].line)
+    tipoHash = getHash(tokens[ig].token, tokens[ig].line)
     if len(tipoHash) > 0:
-        nuevo.nombre = "identifier"
-        nuevo.dato = tokens[ig].token
+        # nuevo.nombre = "identifier"
+        # nuevo.dato = tokens[ig].token
+        nuevo = fin(tipoHash[1])
         temp.hijo[0] = nuevo
         match(';')
         return temp
@@ -263,7 +264,7 @@ def sent_cout():
     temp = Nodo()
     temp.nombre = "Cout"
     match('cout')
-    tipoHash = getHash(temp.dato, tokens[ig].line)
+    tipoHash = getHash(tokens[ig].token, tokens[ig].line)
     if len(tipoHash) > 0:
         temp.hijo[0] = expresion(tipoHash[1])
         match(';')
@@ -294,13 +295,14 @@ def asignacion():
     tipoHash = getHash(tokens[ig].token, tokens[ig].line)
     
     if len(tipoHash) > 0:
-        temp.nombre = "Variable"
-        temp.dato = tokens[ig].token
-        temp.valor = tipoHash[2]
-        if ig < len(tokens)-1:
-            ig += 1
-        else:
-            error(1,"Error en el fin del programa.",tokens[ig].line)
+        # temp.nombre = "Variable"
+        # temp.dato = tokens[ig].token
+        # temp.valor = tipoHash[2]
+        # if ig < len(tokens)-1:
+        #     ig += 1
+        # else:
+        #     error(1,"Error en el fin del programa.",tokens[ig].line)
+        temp = fin(tipoHash[1])
         
         if tokens[ig].token == ":=" or (tokens[ig].token != "++" and tokens[ig].token != "--"):
             match(':=')
@@ -323,7 +325,7 @@ def asignacion():
                         nuevo.valor = str(int(temp.valor) + 1)
                     setHashValue(temp.dato, nuevo.valor, tokens[ig].line)
                 else:
-                    error(1,"Sin valor la variable: "+ temp.dato,tokens[ig].line)
+                    error(1,"[Error] - Sin valor la variable: \""+ temp.dato +'"',tokens[ig].line)
                     while (tokens[ig].token != ';'):
                         if ig < len(tokens)-1:
                             ig += 1
@@ -345,7 +347,7 @@ def asignacion():
                         nuevo.valor = str(int(temp.valor) - 1)
                     setHashValue(temp.dato, nuevo.valor, tokens[ig].line)
                 else:
-                    error(1,"Sin valor la variable: "+ temp.dato,tokens[ig].line)
+                    error(1,"[Error] - Sin valor la variable: \""+ temp.dato +'"',tokens[ig].line)
                     while (tokens[ig].token != ';'):
                         if ig < len(tokens)-1:
                             ig += 1
@@ -470,16 +472,16 @@ def expresion_simple(tipo):
                 nuevo.valor = float(nuevo.hijo[1].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[0].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
                 temp = nuevo
             elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
                 nuevo.valor = float(nuevo.hijo[0].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
             else:
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
 
         elif tokens[ig].token == '-':
@@ -498,16 +500,16 @@ def expresion_simple(tipo):
                 nuevo.valor = float(nuevo.hijo[1].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[0].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
                 temp = nuevo
             elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
                 nuevo.valor = float(nuevo.hijo[0].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
             else:
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
     return temp
 
@@ -533,16 +535,16 @@ def termino(tipo):
                 nuevo.valor = float(nuevo.hijo[1].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[0].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
                 temp = nuevo
             elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
                 nuevo.valor = float(nuevo.hijo[0].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
             else:
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
         elif tokens[ig].token == '/':
             match('/')  
@@ -560,16 +562,16 @@ def termino(tipo):
                 nuevo.valor = float(nuevo.hijo[1].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[0].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
                 temp = nuevo
             elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
                 nuevo.valor = float(nuevo.hijo[0].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
             else:
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
                 temp = nuevo
         elif tokens[ig].token == '%':
             match('%')  
@@ -647,15 +649,37 @@ def fin(tipo,proviene = 0):
         temp.nombre = tokens[ig].tokenType
         temp.dato = tokens[ig].token
         temp.tipo = "int"
-        temp.valor = temp.dato
+        # temp.valor = temp.dato
+        if tipo == 'int':
+            if temp.tipo == 'float':
+                temp.valor = str(int(float(tokens[ig].token)))
+            else:
+                temp.valor = str(int(tokens[ig].token))
+        else:
+            if temp.tipo == 'int':
+                temp.valor = str(float(int(tokens[ig].token)))
+            else:
+                temp.valor = str(float(tokens[ig].token))
         if ig < len(tokens)-1:
             ig += 1
         else:
             error(1,"Error en el fin del programa.",tokens[ig].line)
+
     elif tokens[ig].tokenType == "float":
+        temp.nombre = tokens[ig].tokenType
         temp.dato = tokens[ig].token
         temp.tipo = "float"
-        temp.valor = temp.dato
+        # temp.valor = temp.dato
+        if tipo == 'int':
+            if temp.tipo == 'float':
+                temp.valor = str(int(float(tokens[ig].token)))
+            else:
+                temp.valor = str(int(tokens[ig].token))
+        else:
+            if temp.tipo == 'int':
+                temp.valor = str(float(int(tokens[ig].token)))
+            else:
+                temp.valor = str(float(tokens[ig].token))
         if ig < len(tokens)-1:
             ig += 1
         else:
@@ -680,16 +704,19 @@ def fin(tipo,proviene = 0):
 def error(op, token, line):
     global errors, ig
     if op == 0:
-        errors.append("Error. Se esperaba '" + token + "'. En la linea " + line)
+        errors.append("Error. Se esperaba '" + token + "' en la linea " + line)
         #print("Error. Se esperaba '" + token + "'. En la linea " + line)
     else:
-        errors.append(token + " En la linea " + line)
+        errors.append(token + " en la linea " + line)
         #print(token + " En la linea " + line)
 
 def verNodo(nodo):
     if(nodo != None):
         print("Nodo-> " + str(nodo.nombre))
-        print("Valor-> " + str(nodo.dato))
+        print("Dato-> " + str(nodo.dato))
+        print("Tipo-> " + str(nodo.tipo))
+        print("Valor-> " + str(nodo.valor))
+        print('\n')
         for s in nodo.sibling:
             verNodo(s)
         verNodo(nodo.hijo[0])

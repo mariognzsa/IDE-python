@@ -32,6 +32,10 @@ from lexicAnalyzer import LexicAnalyzer, Token
 import sintacticAnalyzer
 import semanticAnalyzer
 
+from ttkwidgets import Table
+
+from pprint import pprint
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -364,34 +368,24 @@ class Toplevel1:
         scrollbar_vertical.pack(side='right', fill=tk.Y)
         self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.021, relwidth=1.136)
         self.Scrolledtext7.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
-        # self.Scrolledtext7 = ScrolledText(self.compilerTabs_t3)
-        # self.Scrolledtext7.place(relx=0.0, rely=0.0, relheight=1.019
-        #         , relwidth=1.036)
-        # self.Scrolledtext7.configure(background="white")
-        # self.Scrolledtext7.configure(font="TkTextFont")
-        # self.Scrolledtext7.configure(foreground="black")
-        # self.Scrolledtext7.configure(highlightbackground="#d9d9d9")
-        # self.Scrolledtext7.configure(highlightcolor="black")
-        # self.Scrolledtext7.configure(insertbackground="black")
-        # self.Scrolledtext7.configure(insertborderwidth="3")
-        # self.Scrolledtext7.configure(selectbackground="#c4c4c4")
-        # self.Scrolledtext7.configure(selectforeground="black")
-        # self.Scrolledtext7.configure(wrap="none")
 
-        self.Scrolledtext8 = ScrolledText(self.compilerTabs_t4)
-        self.Scrolledtext8.place(relx=0.0, rely=0.0, relheight=1.019
-                , relwidth=1.036)
-        self.Scrolledtext8.configure(background="white")
-        self.Scrolledtext8.configure(font="TkTextFont")
-        self.Scrolledtext8.configure(foreground="black")
-        self.Scrolledtext8.configure(highlightbackground="#d9d9d9")
-        self.Scrolledtext8.configure(highlightcolor="black")
-        self.Scrolledtext8.configure(insertbackground="black")
-        self.Scrolledtext8.configure(insertborderwidth="3")
-        self.Scrolledtext8.configure(selectbackground="#c4c4c4")
-        self.Scrolledtext8.configure(selectforeground="black")
-        self.Scrolledtext8.configure(wrap="none")
+        # Ventana de Hash table
+        columns = ["Variable", "Tipo", "Valor", "Linea"]
+        self.table = Table(self.compilerTabs_t4, columns=columns, sortable=False, drag_cols=False,
+                    drag_rows=False)
+        for col in columns:
+            self.table.heading(col, text=col)
+            self.table.column(col, width=135, stretch=False)
 
+        sx = tk.Scrollbar(self.compilerTabs_t4, orient='horizontal', command=self.table.xview)
+        sy = tk.Scrollbar(self.compilerTabs_t4, orient='vertical', command=self.table.yview)
+        self.table.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
+
+        self.table.grid(sticky='ewns')
+        sx.grid(row=1, column=0, sticky='ew')
+        sy.grid(row=0, column=1, sticky='ns')
+
+        # Ventana de no se que del final
         self.Scrolledtext9 = ScrolledText(self.compilerTabs_t5)
         self.Scrolledtext9.place(relx=0.0, rely=0.0, relheight=1.019
                 , relwidth=1.036)
@@ -417,6 +411,7 @@ class Toplevel1:
         self.errorTabs_t1.configure(background="#d9d9d9")
         self.errorTabs_t1.configure(highlightbackground="#d9d9d9")
         self.errorTabs_t1.configure(highlightcolor="black")
+
         self.errorTabs_t2 = tk.Frame(self.errorTabs)
         self.errorTabs.add(self.errorTabs_t2, padding=3)
         self.errorTabs.tab(1, text="Errores Sintacticos", compound="left"
@@ -424,6 +419,7 @@ class Toplevel1:
         self.errorTabs_t2.configure(background="#d9d9d9")
         self.errorTabs_t2.configure(highlightbackground="#d9d9d9")
         self.errorTabs_t2.configure(highlightcolor="black")
+
         self.errorTabs_t3 = tk.Frame(self.errorTabs)
         self.errorTabs.add(self.errorTabs_t3, padding=3)
         self.errorTabs.tab(2, text="Errores Semanticos", compound="none"
@@ -431,6 +427,7 @@ class Toplevel1:
         self.errorTabs_t3.configure(background="#d9d9d9")
         self.errorTabs_t3.configure(highlightbackground="#d9d9d9")
         self.errorTabs_t3.configure(highlightcolor="black")
+
         self.errorTabs_t4 = tk.Frame(self.errorTabs)
         self.errorTabs.add(self.errorTabs_t4, padding=3)
         self.errorTabs.tab(3, text="Resultados", compound="none", underline="-1"
@@ -444,7 +441,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext5.configure(background="white")
         self.Scrolledtext5.configure(font="TkTextFont")
-        self.Scrolledtext5.configure(foreground="black")
+        self.Scrolledtext5.configure(foreground="red3")
         self.Scrolledtext5.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext5.configure(highlightcolor="black")
         self.Scrolledtext5.configure(insertbackground="black")
@@ -458,7 +455,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext6.configure(background="white")
         self.Scrolledtext6.configure(font="TkTextFont")
-        self.Scrolledtext6.configure(foreground="black")
+        self.Scrolledtext6.configure(foreground="red3")
         self.Scrolledtext6.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext6.configure(highlightcolor="black")
         self.Scrolledtext6.configure(insertbackground="black")
@@ -472,7 +469,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext2.configure(background="white")
         self.Scrolledtext2.configure(font="TkTextFont")
-        self.Scrolledtext2.configure(foreground="black")
+        self.Scrolledtext2.configure(foreground="red3")
         self.Scrolledtext2.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext2.configure(highlightcolor="black")
         self.Scrolledtext2.configure(insertbackground="black")
@@ -486,7 +483,7 @@ class Toplevel1:
                 , relwidth=1.005)
         self.Scrolledtext10.configure(background="white")
         self.Scrolledtext10.configure(font="TkTextFont")
-        self.Scrolledtext10.configure(foreground="black")
+        self.Scrolledtext10.configure(foreground="red3")
         self.Scrolledtext10.configure(highlightbackground="#d9d9d9")
         self.Scrolledtext10.configure(highlightcolor="black")
         self.Scrolledtext10.configure(insertbackground="black")
@@ -622,7 +619,7 @@ class Toplevel1:
         self.Scrolledtext5.delete(1.0, tk.END)#Ventana de Lexico
         self.Scrolledtext6.delete(1.0, tk.END)#Ventana de Sintactico
         # self.Scrolledtext7.delete(1.0, tk.END)#Ventana de Semantico
-        # self.Scrolledtext7.insert(tk.END, "Hola")
+        # self.Scrolledtext8.insert(tk.END, "Hola")
         #Reseting sintactic analyzer globals
         sintacticAnalyzer.ig = 0
         sintacticAnalyzer.EOF = False
@@ -663,17 +660,33 @@ class Toplevel1:
             for error in semanticAnalyzer.errors:
                 self.Scrolledtext2.insert(tk.END, error + "\n")
             #Treeview
-            # print(vars(self.sem_analyzer))
+            # semanticAnalyzer.verNodo(self.sem_analyzer)
             self.verNodoSemantico(self.sem_analyzer, "")
+            # Hash table generation
+            iterador = 0
+            for hash_row in semanticAnalyzer.hash:
+                if hash_row != None:
+                    print(str(hash_row[0]) + "#" + str(hash_row[1]) + "#" + str(hash_row[2]) + "#")
+                    print('|'.join(hash_row[3]) + "\n")
+                    self.table.insert('', 'end', iid=iterador,
+                            values = tuple(hash_row))
+                    iterador += 1
 
     def verNodoSemantico(self, nodo, padre):
         if(nodo != None):
-            item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
+            if str(nodo.nombre) != "None":
+                item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
+            else:
+                item = self.Scrolledtext7.insert(padre, tk.END, text=str(''))
             self.Scrolledtext7.item(item, open=True)#Showing the Treeview expanded
             if str(nodo.dato) != "None":
                 self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
+            if str(nodo.tipo) != "None":
+                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.tipo))
+            if str(nodo.valor) != "None":
+                self.Scrolledtext7.insert(item, tk.END, text=str(nodo.valor))
             for s in nodo.sibling:
-                self.verNodo(s,padre)
+                self.verNodoSemantico(s,padre)
             self.verNodoSemantico(nodo.hijo[0],item)
             self.verNodoSemantico(nodo.hijo[1],item)
             self.verNodoSemantico(nodo.hijo[2],item)
