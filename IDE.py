@@ -59,6 +59,9 @@ def destroy_Toplevel1():
     w = None
 
 class Toplevel1:
+
+    _DIRECTORY_PATH_ = './'
+
     def __init__(self, top=None):
         self.analyzer = LexicAnalyzer()   # Initializing the lexic analyzer
         '''This class configures and populates the toplevel window.
@@ -196,27 +199,27 @@ class Toplevel1:
                 command=self.debug)
 
         # Image files
-        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/file-multiple.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/file-multiple.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_new_file = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/content-save.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/content-save.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/content-save-edit.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/content-save-edit.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_save_as = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/folder-open.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/folder-open.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_open = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/play-pause.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/play-pause.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_compile = ImageTk.PhotoImage(self.image)
 
-        self.image = Image.open("C:/Users/Keneth4/Documents/Repos/IDE-python/img/bug-check-outline.png")
+        self.image = Image.open(self._DIRECTORY_PATH_ + "img/bug-check-outline.png")
         self.image = self.image.resize((18,18), Image.ANTIALIAS)
         self.img_debug = ImageTk.PhotoImage(self.image)
 
