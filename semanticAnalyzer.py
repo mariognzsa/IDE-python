@@ -397,7 +397,7 @@ def expresion(tipo = 'bool'):
             nuevo.nombre = "<"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
-            nuevo.tipo = 'boolean'
+            nuevo.tipo = 'bool'
             if float(nuevo.hijo[0].valor) < float(nuevo.hijo[1].valor):
                 nuevo.valor = 'True'
             else:
@@ -408,7 +408,7 @@ def expresion(tipo = 'bool'):
             nuevo.nombre = ">"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
-            nuevo.tipo = 'boolean'
+            nuevo.tipo = 'bool'
             if float(nuevo.hijo[0].valor) > float(nuevo.hijo[1].valor):
                 nuevo.valor = 'True'
             else:
@@ -419,7 +419,7 @@ def expresion(tipo = 'bool'):
             nuevo.nombre = ">="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
-            nuevo.tipo = 'boolean'
+            nuevo.tipo = 'bool'
             if float(nuevo.hijo[0].valor) >= float(nuevo.hijo[1].valor):
                 nuevo.valor = 'True'
             else:
@@ -430,7 +430,7 @@ def expresion(tipo = 'bool'):
             nuevo.nombre = "=="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
-            nuevo.tipo = 'boolean'
+            nuevo.tipo = 'bool'
             if float(nuevo.hijo[0].valor) == float(nuevo.hijo[1].valor):
                 nuevo.valor = 'True'
             else:
@@ -441,7 +441,7 @@ def expresion(tipo = 'bool'):
             nuevo.nombre = "!="
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
-            nuevo.tipo = 'boolean'
+            nuevo.tipo = 'bool'
             if float(nuevo.hijo[0].valor) != float(nuevo.hijo[1].valor):
                 nuevo.valor = 'True'
             else:
