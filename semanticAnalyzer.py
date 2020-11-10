@@ -309,15 +309,27 @@ def asignacion():
             nuevo.nombre = "Asignacion"
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion(temp.tipo)
-            nuevo.valor = nuevo.hijo[1].valor
-            setHashValue(temp.dato, nuevo.hijo[1].valor, tokens[ig].line)
+
+            if tipoHash[1] == nuevo.hijo[1].tipo:
+                nuevo.valor = nuevo.hijo[1].valor
+                nuevo.tipo = nuevo.hijo[0].tipo
+                setHashValue(temp.dato, nuevo.hijo[1].valor, tokens[ig].line)
+            else:
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
             match(';')
+
+            #nuevo.valor = nuevo.hijo[1].valor
+            #setHashValue(temp.dato, nuevo.hijo[1].valor, tokens[ig].line)
+            #temp = nuevo
+            #match(';')
+
         elif tokens[ig].token == "++" or tokens[ig].token == "--":
             if tokens[ig].token == "++":
                 match(':=')
                 nuevo.nombre = "++"
                 nuevo.hijo[0] = temp
+                nuevo.tipo = nuevo.hijo[0].tipo
                 nuevo.dato = str(temp.dato) + str("+1")
                 if temp.valor != '' and temp.valor != None:
                     nuevo.valor = str(float(temp.valor) + 1)
@@ -340,6 +352,7 @@ def asignacion():
                 match('--')
                 nuevo.nombre = ":="
                 nuevo.hijo[0] = temp
+                nuevo.tipo = nuevo.hijo[0].tipo
                 nuevo.dato = str(temp.dato) + str("-1")
                 if temp.valor != ''and temp.valor != None:
                     nuevo.valor = str(float(temp.valor) - 1)
@@ -380,6 +393,7 @@ def expresion(tipo = 'bool'):
     temp = expresion_simple(tipo)
     #temp.tipo = "bool"
     nuevo.valor = temp.valor
+    nuevo.tipo = temp.tipo
     if(tokens[ig].token == '<=' or tokens[ig].token == '<' or tokens[ig].token == '>=' or tokens[ig].token == '>' or tokens[ig].token == '==' or tokens[ig].token == '!='):
         if tokens[ig].token == '<=':
             match('<=')  
@@ -387,10 +401,23 @@ def expresion(tipo = 'bool'):
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
             nuevo.tipo = 'bool'
-            if float(nuevo.hijo[0].valor) <= float(nuevo.hijo[1].valor):
-                nuevo.valor = 'True'
+            # REGLA 1:int <= int = int
+            # REGLA 3:float <= float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo:
+                if nuevo.hijo[0].tipo == 'int':
+                    if int(nuevo.hijo[0].valor) <= int(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+                else:
+                    if float(nuevo.hijo[0].valor) <= float(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+            # REGLA 5:float <= int//Error
+            # REGLA 7:int <= float//Error
             else:
-                nuevo.valor = 'False'
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
         elif tokens[ig].token == '<':
             match('<')  
@@ -398,10 +425,23 @@ def expresion(tipo = 'bool'):
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
             nuevo.tipo = 'bool'
-            if float(nuevo.hijo[0].valor) < float(nuevo.hijo[1].valor):
-                nuevo.valor = 'True'
+            # REGLA 1:int < int = int
+            # REGLA 3:float < float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo:
+                if nuevo.hijo[0].tipo == 'int':
+                    if int(nuevo.hijo[0].valor) < int(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+                else:
+                    if float(nuevo.hijo[0].valor) < float(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+            # REGLA 5:float < int//Error
+            # REGLA 7:int < float//Error
             else:
-                nuevo.valor = 'False'
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
         elif tokens[ig].token == '>':
             match('>')  
@@ -409,10 +449,23 @@ def expresion(tipo = 'bool'):
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
             nuevo.tipo = 'bool'
-            if float(nuevo.hijo[0].valor) > float(nuevo.hijo[1].valor):
-                nuevo.valor = 'True'
+            # REGLA 1:int > int = int
+            # REGLA 3:float > float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo:
+                if nuevo.hijo[0].tipo == 'int':
+                    if int(nuevo.hijo[0].valor) > int(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+                else:
+                    if float(nuevo.hijo[0].valor) > float(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+            # REGLA 5:float > int//Error
+            # REGLA 7:int > float//Error
             else:
-                nuevo.valor = 'False'
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
         elif tokens[ig].token == '>=':
             match('>=')  
@@ -420,10 +473,23 @@ def expresion(tipo = 'bool'):
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
             nuevo.tipo = 'bool'
-            if float(nuevo.hijo[0].valor) >= float(nuevo.hijo[1].valor):
-                nuevo.valor = 'True'
+            # REGLA 1:int >= int = int
+            # REGLA 3:float >= float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo:
+                if nuevo.hijo[0].tipo == 'int':
+                    if int(nuevo.hijo[0].valor) >= int(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+                else:
+                    if float(nuevo.hijo[0].valor) >= float(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+            # REGLA 5:float >= int//Error
+            # REGLA 7:int >= float//Error
             else:
-                nuevo.valor = 'False'
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
         elif tokens[ig].token == '==':
             match('==')  
@@ -431,10 +497,23 @@ def expresion(tipo = 'bool'):
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
             nuevo.tipo = 'bool'
-            if float(nuevo.hijo[0].valor) == float(nuevo.hijo[1].valor):
-                nuevo.valor = 'True'
+            # REGLA 1:int == int = int
+            # REGLA 3:float == float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo:
+                if nuevo.hijo[0].tipo == 'int':
+                    if int(nuevo.hijo[0].valor) == int(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+                else:
+                    if float(nuevo.hijo[0].valor) == float(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+            # REGLA 5:float == int//Error
+            # REGLA 7:int == float//Error
             else:
-                nuevo.valor = 'False'
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
         elif tokens[ig].token == '!=':
             match('!=')  
@@ -442,10 +521,23 @@ def expresion(tipo = 'bool'):
             nuevo.hijo[0] = temp
             nuevo.hijo[1] = expresion_simple(tipo)
             nuevo.tipo = 'bool'
-            if float(nuevo.hijo[0].valor) != float(nuevo.hijo[1].valor):
-                nuevo.valor = 'True'
+            # REGLA 1:int != int = int
+            # REGLA 3:float != float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo:
+                if nuevo.hijo[0].tipo == 'int':
+                    if int(nuevo.hijo[0].valor) != int(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+                else:
+                    if float(nuevo.hijo[0].valor) != float(nuevo.hijo[1].valor):
+                        nuevo.valor = 'True'
+                    else:
+                        nuevo.valor = 'False'
+            # REGLA 5:float != int//Error
+            # REGLA 7:int != float//Error
             else:
-                nuevo.valor = 'False'
+                error(1,"[Error] - Datos incompatibles",tokens[ig].line)
             temp = nuevo
     return temp
 
@@ -463,26 +555,17 @@ def expresion_simple(tipo):
             nuevo.hijo[1] = termino(tipo)
             nuevo.tipo = tipo
 
-            if (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[0].valor) + float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor) + int(nuevo.hijo[1].valor)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor == '' and nuevo.hijo[0].valor == None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
-                nuevo.valor = float(nuevo.hijo[0].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+            # REGLA 1:int + int = int
+            # REGLA 2:float + float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo and nuevo.hijo[0].tipo == 'int':
+                nuevo.tipo = nuevo.hijo[0].tipo
+                nuevo.valor = int(nuevo.hijo[0].valor) + int(nuevo.hijo[1].valor)                
+            # REGLA 3:float + int = float
+            # REGLA 4:int + float = float
             else:
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+                nuevo.tipo = 'float'
+                nuevo.valor = float(nuevo.hijo[0].valor) + float(nuevo.hijo[1].valor)
+            temp = nuevo
 
         elif tokens[ig].token == '-':
             match('-')  
@@ -491,26 +574,17 @@ def expresion_simple(tipo):
             nuevo.hijo[1] = termino(tipo)
             nuevo.tipo = tipo
 
-            if (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[0].valor) - float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor) - int(nuevo.hijo[1].valor)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor == '' and nuevo.hijo[0].valor == None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
-                nuevo.valor = float(nuevo.hijo[0].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+            # REGLA 1:int - int = int
+            # REGLA 2:float - float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo and nuevo.hijo[0].tipo == 'int':
+                nuevo.tipo = nuevo.hijo[0].tipo
+                nuevo.valor = int(nuevo.hijo[0].valor) - int(nuevo.hijo[1].valor)
+            # REGLA 3:float - int = float
+            # REGLA 4:int - float = float
             else:
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+                nuevo.tipo = 'float'
+                nuevo.valor = float(nuevo.hijo[0].valor) - float(nuevo.hijo[1].valor)
+            temp = nuevo
     return temp
 
 def termino(tipo):
@@ -526,26 +600,18 @@ def termino(tipo):
             nuevo.hijo[1] = factor(tipo)
             nuevo.tipo = tipo
             
-            if (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[0].valor) * float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor) * int(nuevo.hijo[1].valor)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor == '' and nuevo.hijo[0].valor == None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
-                nuevo.valor = float(nuevo.hijo[0].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+            # REGLA 1:int * int = int
+            # REGLA 2:float * float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo and nuevo.hijo[0].tipo == 'int':
+                nuevo.tipo = nuevo.hijo[0].tipo
+                nuevo.valor = int(nuevo.hijo[0].valor) * int(nuevo.hijo[1].valor)
+            # REGLA 3:float * int = float
+            # REGLA 4:int * float = float
             else:
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+                nuevo.tipo = 'float'
+                nuevo.valor = float(nuevo.hijo[0].valor) * float(nuevo.hijo[1].valor)
+            temp = nuevo
+
         elif tokens[ig].token == '/':
             match('/')  
             nuevo.nombre = "/"
@@ -553,26 +619,18 @@ def termino(tipo):
             nuevo.hijo[1] = factor(tipo)
             nuevo.tipo = tipo
 
-            if (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[0].valor) / float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor) / int(nuevo.hijo[1].valor)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor == '' and nuevo.hijo[0].valor == None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value +'"',tokens[ig].line)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
-                nuevo.valor = float(nuevo.hijo[0].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+            # REGLA 1:int / int = int
+            # REGLA 2:float / float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo and nuevo.hijo[0].tipo == 'int':
+                nuevo.tipo = nuevo.hijo[0].tipo
+                nuevo.valor = int(int(nuevo.hijo[0].valor) / int(nuevo.hijo[1].valor))
+            # REGLA 3:float / int = float
+            # REGLA 4:int / float = float
             else:
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value +'"',tokens[ig].line)
-                temp = nuevo
+                nuevo.tipo = 'float'
+                nuevo.valor = float(nuevo.hijo[0].valor) / float(nuevo.hijo[1].valor)
+            temp = nuevo
+
         elif tokens[ig].token == '%':
             match('%')  
             nuevo.nombre = "%"
@@ -580,26 +638,18 @@ def termino(tipo):
             nuevo.hijo[1] = factor(tipo)
             nuevo.tipo = tipo
 
-            if (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[0].valor) % float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor) % int(nuevo.hijo[1].valor)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor == '' and nuevo.hijo[0].valor == None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-                nuevo.valor = float(nuevo.hijo[1].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value+'"',tokens[ig].line)
-                temp = nuevo
-            elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
-                nuevo.valor = float(nuevo.hijo[0].valor)
-                if nuevo.tipo == 'int':
-                    nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
-                temp = nuevo
+            # REGLA 1:int % int = int
+            # REGLA 2:float % float = float
+            if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo and nuevo.hijo[0].tipo == 'int':
+                nuevo.tipo = nuevo.hijo[0].tipo
+                nuevo.valor = int(nuevo.hijo[0].valor) % int(nuevo.hijo[1].valor)
+            # REGLA 3:float % int = float
+            # REGLA 4:int % float = float
             else:
-                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
-                temp = nuevo
+                nuevo.tipo = 'float'
+                nuevo.valor = float(nuevo.hijo[0].valor) % float(nuevo.hijo[1].valor)
+            temp = nuevo
+
     return temp
 
 def factor(tipo):
@@ -614,26 +664,18 @@ def factor(tipo):
         nuevo.hijo[1] = fin(tipo)
         nuevo.tipo = tipo
 
-        if (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-            nuevo.valor = float(nuevo.hijo[0].valor) ** float(nuevo.hijo[1].valor)
-            if nuevo.tipo == 'int':
-                nuevo.valor = int(nuevo.hijo[0].valor) ** int(nuevo.hijo[1].valor)
-            temp = nuevo
-        elif (nuevo.hijo[0].valor == '' and nuevo.hijo[0].valor == None) and (nuevo.hijo[1].valor != '' and nuevo.hijo[1].valor != None):
-            nuevo.valor = float(nuevo.hijo[1].valor)
-            if nuevo.tipo == 'int':
-                nuevo.valor = int(nuevo.hijo[1].valor)
-            error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value+'"',tokens[ig].line)
-            temp = nuevo
-        elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
-            nuevo.valor = float(nuevo.hijo[0].valor)
-            if nuevo.tipo == 'int':
-                nuevo.valor = int(nuevo.hijo[0].valor)
-            error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
-            temp = nuevo
+        # REGLA 1:int ** int = int
+        # REGLA 2:float ** float = float
+        if nuevo.hijo[0].tipo == nuevo.hijo[1].tipo and nuevo.hijo[0].tipo == 'int':
+            nuevo.tipo = nuevo.hijo[0].tipo
+            nuevo.valor = int(nuevo.hijo[0].valor) ** int(nuevo.hijo[1].valor)
+        # REGLA 3:float ** int = float
+        # REGLA 4:int ** float = float
         else:
-            error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
-            temp = nuevo
+            nuevo.tipo = 'float'
+            nuevo.valor = float(nuevo.hijo[0].valor) ** float(nuevo.hijo[1].valor)
+        temp = nuevo
+
     return temp
 
 def fin(tipo,proviene = 0):
@@ -650,7 +692,7 @@ def fin(tipo,proviene = 0):
         temp.dato = tokens[ig].token
         temp.tipo = "int"
         # temp.valor = temp.dato
-        if tipo == 'int':
+        '''if tipo == 'int':
             if temp.tipo == 'float':
                 temp.valor = str(int(float(tokens[ig].token)))
             else:
@@ -659,7 +701,8 @@ def fin(tipo,proviene = 0):
             if temp.tipo == 'int':
                 temp.valor = str(float(int(tokens[ig].token)))
             else:
-                temp.valor = str(float(tokens[ig].token))
+                temp.valor = str(float(tokens[ig].token))'''
+        temp.valor = str(int(tokens[ig].token))
         if ig < len(tokens)-1:
             ig += 1
         else:
@@ -670,7 +713,7 @@ def fin(tipo,proviene = 0):
         temp.dato = tokens[ig].token
         temp.tipo = "float"
         # temp.valor = temp.dato
-        if tipo == 'int':
+        '''if tipo == 'int':
             if temp.tipo == 'float':
                 temp.valor = str(int(float(tokens[ig].token)))
             else:
@@ -679,7 +722,8 @@ def fin(tipo,proviene = 0):
             if temp.tipo == 'int':
                 temp.valor = str(float(int(tokens[ig].token)))
             else:
-                temp.valor = str(float(tokens[ig].token))
+                temp.valor = str(float(tokens[ig].token))'''
+        temp.valor = str(float(tokens[ig].token))
         if ig < len(tokens)-1:
             ig += 1
         else:

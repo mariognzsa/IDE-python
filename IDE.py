@@ -828,6 +828,7 @@ class Toplevel1:
 
     def verNodoSemantico(self, nodo, padre):
         if(nodo != None):
+            self.semantic_info = ''
             if str(nodo.nombre) != "None":
                 item = self.Scrolledtext7.insert(padre, tk.END, text=str(nodo.nombre))
             else:
@@ -835,15 +836,28 @@ class Toplevel1:
             self.Scrolledtext7.item(item, open=True)#Showing the Treeview expanded
             if str(nodo.dato) != "None":
                 if str(nodo.nombre) == "integer" or str(nodo.nombre) == "float":
-                    self.Scrolledtext7.insert(item, tk.END, text="Numero: "+str(nodo.dato))
+                    self.semantic_info = "Numero: "+str(nodo.dato)
+                    #self.Scrolledtext7.insert(item, tk.END, text="Numero: "+str(nodo.dato))
                 elif str(nodo.nombre) == "identifier":
-                    self.Scrolledtext7.insert(item, tk.END, text="Variable: "+str(nodo.dato))
+                    self.semantic_info = "Variable: "+str(nodo.dato)
+                    #self.Scrolledtext7.insert(item, tk.END, text="Variable: "+str(nodo.dato))
                 else:
-                    self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
+                    self.semantic_info = str(nodo.dato)
+                    #self.Scrolledtext7.insert(item, tk.END, text=str(nodo.dato))
             if str(nodo.tipo) != "None":
-                self.Scrolledtext7.insert(item, tk.END, text="Tipo: "+str(nodo.tipo))
+                if self.semantic_info != '':
+                    self.semantic_info += ", Tipo: "+str(nodo.tipo)
+                else:
+                    self.semantic_info += "Tipo: "+str(nodo.tipo)
+                #self.Scrolledtext7.insert(item, tk.END, text="Tipo: "+str(nodo.tipo))
             if str(nodo.valor) != "None" and str(nodo.valor) != "":
-                self.Scrolledtext7.insert(item, tk.END, text="Valor: "+str(nodo.valor))
+                if self.semantic_info != '':
+                    self.semantic_info += ", Valor: "+str(nodo.valor)
+                else:
+                    self.semantic_info += "Valor: "+str(nodo.valor)
+                #self.Scrolledtext7.insert(item, tk.END, text="Valor: "+str(nodo.valor))
+            if self.semantic_info != '':
+                self.Scrolledtext7.insert(item, tk.END, text=self.semantic_info)
             for s in nodo.sibling:
                 self.verNodoSemantico(s,padre)
             self.verNodoSemantico(nodo.hijo[0],item)
