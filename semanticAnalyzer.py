@@ -695,6 +695,8 @@ def fin(tipo,proviene = 0):
             tipohash = getHash(temp.dato, tokens[ig].line)
             temp.tipo = tipohash[1]
             temp.valor = tipohash[2]
+        elif bandera == -1:
+            temp = None
         if ig < len(tokens)-1:
             ig += 1
         else:
