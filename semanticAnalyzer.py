@@ -589,16 +589,16 @@ def termino(tipo):
                 nuevo.valor = float(nuevo.hijo[1].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[1].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[0].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value+'"',tokens[ig].line)
                 temp = nuevo
             elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
                 nuevo.valor = float(nuevo.hijo[0].valor)
                 if nuevo.tipo == 'int':
                     nuevo.valor = int(nuevo.hijo[0].valor)
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
                 temp = nuevo
             else:
-                error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+                error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
                 temp = nuevo
     return temp
 
@@ -623,16 +623,16 @@ def factor(tipo):
             nuevo.valor = float(nuevo.hijo[1].valor)
             if nuevo.tipo == 'int':
                 nuevo.valor = int(nuevo.hijo[1].valor)
-            error(1,"Sin valor la variable: "+nuevo.hijo[0].value,tokens[ig].line)
+            error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[0].value+'"',tokens[ig].line)
             temp = nuevo
         elif (nuevo.hijo[0].valor != '' and nuevo.hijo[0].valor != None) and (nuevo.hijo[1].valor == '' and nuevo.hijo[1].valor == None):
             nuevo.valor = float(nuevo.hijo[0].valor)
             if nuevo.tipo == 'int':
                 nuevo.valor = int(nuevo.hijo[0].valor)
-            error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+            error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
             temp = nuevo
         else:
-            error(1,"Sin valor la variable: "+nuevo.hijo[1].value,tokens[ig].line)
+            error(1,"[Error] - Sin valor la variable: \""+nuevo.hijo[1].value+'"',tokens[ig].line)
             temp = nuevo
     return temp
 

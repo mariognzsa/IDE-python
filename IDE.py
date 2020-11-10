@@ -373,12 +373,17 @@ class Toplevel1:
         self.Scrolledtext7.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
 
         # Ventana de Hash table
+        self.compilerTabs_t4.columnconfigure(0, weight=1)
+        self.compilerTabs_t4.rowconfigure(0, weight=1)
         columns = ["Variable", "Tipo", "Valor", "Linea"]
         self.table = Table(self.compilerTabs_t4, columns=columns, sortable=False, drag_cols=False,
                     drag_rows=False)
+        widths = [100, 100, 100, 240]
+        i = 0
         for col in columns:
             self.table.heading(col, text=col)
-            self.table.column(col, width=135, stretch=False)
+            self.table.column(col, width=widths[i], stretch=False)
+            i += 1
 
         sx = tk.Scrollbar(self.compilerTabs_t4, orient='horizontal', command=self.table.xview)
         sy = tk.Scrollbar(self.compilerTabs_t4, orient='vertical', command=self.table.yview)
